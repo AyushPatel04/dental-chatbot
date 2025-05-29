@@ -1,6 +1,14 @@
 # 🦷 Dental Chatbot
 
-A simple AI-powered chatbot that helps users describe dental symptoms and receive helpful responses. Built with React (frontend) and Node.js/Express (backend), and powered by OpenAI's GPT model.
+© 2025 Ayush Patel and Aditya Rao. All Rights Reserved.
+
+This project and its source code are protected by copyright law. No part of this repository may be copied, reproduced, distributed, or used in any way without the express written permission of the authors.
+
+For licensing inquiries or permission requests, contact: ayush81304@gmail.com
+
+---
+
+An AI-powered chatbot that helps users describe dental symptoms and receive helpful responses. Built with React (frontend) and Node.js/Express (backend), and powered by OpenAI's GPT model.
 
 ---
 
