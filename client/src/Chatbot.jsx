@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import expandIcon from "./assets/expand.png"; // Your expand/minimize icon
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
@@ -6,20 +7,20 @@ export default function Chatbot() {
   ]);
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
   const messagesEndRef = useRef(null);
 
   const handleSend = async () => {
     if (!input.trim()) return;
-
     const lowerInput = input.trim().toLowerCase();
     const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setUserMessageCount((count) => count + 1);
 
-    // Respond with appointment link if user said yes
+    // Appointment prompt logic (optional, from your code)
     if (
       appointmentPrompted &&
       (lowerInput.includes("yes") || lowerInput.includes("sure") || lowerInput.includes("okay"))
@@ -56,7 +57,7 @@ export default function Chatbot() {
             },
           ]);
           setAppointmentPrompted(true);
-        }, 800); // Slight delay for realism
+        }, 800);
       }
     } catch (err) {
       console.error("Error contacting AI server:", err);
@@ -71,30 +72,53 @@ export default function Chatbot() {
 
   return (
     <>
+      {/* Floating green chat button */}
       {!isOpen && (
         <button className="chatbot-toggle" onClick={() => setIsOpen(true)}>
           💬
         </button>
       )}
 
+      {/* Main chatbot window */}
       {isOpen && (
-        <div className="chatbot-container">
+        <div className={`chatbot-container${isMaximized ? " maximized" : ""}`}>
           <div className="chatbot-ui">
-            {/* Minimize Button */}
-            <div className="flex justify-center mb-1">
+            {/* Header with expand/minimize (left) and chat icon (center) */}
+            <div className="chatbot-header">
+              {/* Left: Expand/minimize arrow */}
               <button
-                className="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs"
-                onClick={() => setIsOpen(false)}
+                className="expand-btn"
+                onClick={() => setIsMaximized((m) => !m)}
+                title={isMaximized ? "Minimize" : "Maximize"}
               >
-                💬
+                <img
+                  src={expandIcon}
+                  alt={isMaximized ? "Minimize" : "Maximize"}
+                  style={{ width: 24, height: 24 }}
+                />
               </button>
+              {/* Center: White chat bubble icon */}
+              <div className="chatbot-center-icon">
+                <button
+                  className="chat-center-btn"
+                  onClick={() => setIsOpen(false)}
+                  title="Minimize"
+                >
+                  {/* SVG chat bubble */}
+                  <svg width="28" height="28" fill="none" viewBox="0 0 28 28">
+                    <rect x="2" y="4" width="24" height="18" rx="5" fill="#fff" stroke="#b2dfdb" strokeWidth="2" />
+                    <circle cx="8" cy="13" r="1.5" fill="#b2dfdb" />
+                    <circle cx="14" cy="13" r="1.5" fill="#b2dfdb" />
+                    <circle cx="20" cy="13" r="1.5" fill="#b2dfdb" />
+                  </svg>
+                </button>
+              </div>
             </div>
-
-            <h2 className="text-center text-lg font-bold text-[#004d4d] mb-1">
+            {/* Title */}
+            <h2 className="text-center text-lg font-bold text-[#004d4d] mb-1 mt-8">
               Dental AI Assistant
             </h2>
-
-            {/* Scrollable Messages */}
+            {/* Messages */}
             <div className="messages-container">
               {messages.map((msg, i) => (
                 <div
@@ -114,8 +138,7 @@ export default function Chatbot() {
               ))}
               <div ref={messagesEndRef} />
             </div>
-
-            {/* Input Bar */}
+            {/* Input bar */}
             <div className="chat-input-row">
               <input
                 className="chat-input"
