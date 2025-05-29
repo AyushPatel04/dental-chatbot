@@ -44,15 +44,6 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-<<<<<<< HEAD
-  width: 320px;
-  max-height: 400px;
-  background-color: #e0f7f1; /* light teal */
-  border: 2px solid #006064; /* dark teal */
-  border-radius: 12px;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-=======
   width: 360px;
   height: 500px;
   background-color: #f5f5f5;
@@ -60,7 +51,6 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
->>>>>>> origin/master
   z-index: 1000;
 }
 
@@ -68,11 +58,7 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-<<<<<<< HEAD
-  background-color: #006064; /* dark teal */
-=======
   background-color: #006064;
->>>>>>> origin/master
   color: white;
   border: none;
   border-radius: 50%;
@@ -85,31 +71,6 @@
 }
 
 .chatbot-ui {
-<<<<<<< HEAD
-  padding: 16px;
-  font-family: sans-serif;
-  color: #00363a; /* deep teal text */
-}
-
-.chat-input {
-  width: 68%;
-  padding: 8px;
-  border: 1px solid #004d40;
-  border-radius: 4px;
-  margin-right: 8px;
-  font-size: 14px;
-}
-
-.send-btn {
-  background-color: #00796b; /* medium teal */
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-=======
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -216,4 +177,3 @@
     transform: translateY(0);
   }
 }
->>>>>>> origin/master
