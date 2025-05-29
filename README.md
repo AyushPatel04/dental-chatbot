@@ -31,10 +31,36 @@ git clone https://github.com/AyushPatel04/dental-chatbot.git
 cd dental-chatbot
 ```
 
-### 1. Install dependencies
+### 2. Install dependencies
 
 Backend
 ```bash
 cd server
 npm install
 ```
+Frontend
+```bash
+cd ../client
+npm install
+```
+### 3. Set up environment variables
+
+Create a .env file in the server folder
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 4. Run the application
+
+Start Backend
+```bash
+cd server
+node index.js
+```
+Start Frontend
+```bash
+cd ../client
+npm start
+```
+Then visit http://localhost:3000 in your browser.
+
