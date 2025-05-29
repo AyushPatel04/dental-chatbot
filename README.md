@@ -33,7 +33,8 @@ cd dental-chatbot
 
 ### 1. Install dependencies
 
-```bash Backend
+Backend
+```bash
 cd server
 npm install
 ```
