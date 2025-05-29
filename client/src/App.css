@@ -52,6 +52,18 @@
   display: flex;
   flex-direction: column;
   z-index: 1000;
+  transition: width 0.2s, height 0.2s;
+}
+
+.chatbot-container.maximized {
+  width: 96vw !important;
+  height: 92vh !important;
+  right: 2vw !important;
+  bottom: 2vh !important;
+  max-width: 900px;
+  max-height: 900px;
+  z-index: 1100;
+  transition: width 0.2s, height 0.2s;
 }
 
 .chatbot-toggle {
@@ -76,6 +88,75 @@
   height: 100%;
   font-family: sans-serif;
   color: #00363a;
+  position: relative;
+}
+
+/* Header with left and center icons */
+.chatbot-header {
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Top left expand/minimize button */
+.expand-btn {
+  margin-top: 14px;
+  margin-left: 14px;
+  background: transparent;        /* No color/box */
+  border: none;
+  border-radius: 8px;
+  padding: 3px 6px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.2s;
+  z-index: 12;
+  box-shadow: none;              /* Remove box shadow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.expand-btn:hover {
+  background: #b2dfdb33;        /* very light hover, or use transparent */
+}
+
+/* Top center chat bubble icon (minimize) */
+.chatbot-center-icon {
+  position: absolute;
+  left: 50%;
+  top: -11px;
+  transform: translateX(-50%);
+  z-index: 11;
+}
+.chat-center-btn {
+  margin-top: 22px;              /* Increased to avoid overlap with title */
+  background: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 4px 7px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-center-btn:hover {
+  background: #e0f7f1;
+}
+
+/* Give more space below header for the title */
+h2 {
+  margin-top: 56px !important;   /* More space so title is not overlapped */
+  margin-bottom: 12px;
 }
 
 .messages-container {
