@@ -108,8 +108,8 @@
 
 /* Top left expand/minimize button */
 .expand-btn {
-  margin-top: 14px;
-  margin-left: 14px;
+  margin-top: 0px;
+  margin-left: -5px;
   background: transparent;        /* No color/box */
   border: none;
   border-radius: 8px;
@@ -125,32 +125,6 @@
 }
 .expand-btn:hover {
   background: #b2dfdb33;        /* very light hover, or use transparent */
-}
-
-/* Top center chat bubble icon (minimize) */
-.chatbot-center-icon {
-  position: absolute;
-  left: 50%;
-  top: -11px;
-  transform: translateX(-50%);
-  z-index: 11;
-}
-.chat-center-btn {
-  margin-top: 22px;              /* Increased to avoid overlap with title */
-  background: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 4px 7px;
-  cursor: pointer;
-  pointer-events: auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.chat-center-btn:hover {
-  background: #e0f7f1;
 }
 
 /* Give more space below header for the title */
@@ -198,6 +172,7 @@ h2 {
 /* Message alignment */
 .message-row {
   display: flex;
+  align-items: flex-end;
   margin: 4px 8px;
 }
 
@@ -258,3 +233,98 @@ h2 {
     transform: translateY(0);
   }
 }
+
+/* Custom LeadBot-style top header */
+.chatbot-top-header {
+  height: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #00796b; /* Match send button */
+  padding: 10px 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  color: white;
+}
+
+.header-left,
+.header-center,
+.header-right {
+  pointer-events: auto;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.minimize-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.minimize-btn:hover {
+  opacity: 0.8;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  flex: 2;
+}
+
+.bot-avatar {
+  width: 55px;
+  height: 55px;
+}
+
+.bot-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ✅ centers child text elements */
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.bot-name {
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+
+.bot-status {
+  color: #d4f9e5;
+  font-size: 11px;
+}
+
+.message-avatar {
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background-color: #00796b; /* Same green as header/send button */
+  padding: 4px;
+  object-fit: contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+

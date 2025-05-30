@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import expandIcon from "./assets/expand.png"; // Your expand/minimize icon
+import expandIcon from "./assets/expand.png";
+import botProfile from "./assets/botProfile.png";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
@@ -20,7 +21,6 @@ export default function Chatbot() {
     setInput("");
     setUserMessageCount((count) => count + 1);
 
-    // Appointment prompt logic (optional, from your code)
     if (
       appointmentPrompted &&
       (lowerInput.includes("yes") || lowerInput.includes("sure") || lowerInput.includes("okay"))
@@ -28,7 +28,7 @@ export default function Chatbot() {
       setMessages((prev) => [
         ...prev,
         {
-          text: "Great! You can set your appointment here: https://docs.google.com/forms/d/e/1FAIpQLSfdL4jPbQ5TfYHccOk8fm73q07qyknY8jCZ-onGu5dV4UnORg/viewform?usp=header",
+          text: "Great! You can set your appointment here: [Google Form Link]",
           sender: "bot"
         }
       ]);
@@ -46,7 +46,6 @@ export default function Chatbot() {
       const botMessage = { text: data.reply, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
 
-      // Prompt to set appointment after 3 user messages
       if (userMessageCount + 1 === 3 && !appointmentPrompted) {
         setTimeout(() => {
           setMessages((prev) => [
@@ -72,80 +71,62 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Floating green chat button */}
       {!isOpen && (
         <button className="chatbot-toggle" onClick={() => setIsOpen(true)}>
           💬
         </button>
       )}
 
-      {/* Main chatbot window */}
       {isOpen && (
         <div className={`chatbot-container${isMaximized ? " maximized" : ""}`}>
           <div className="chatbot-ui">
-            {/* Header with expand/minimize (left) and chat icon (center) */}
-            <div className="chatbot-header">
-              {/* Left: Expand/minimize arrow */}
-              <button
-                className="expand-btn"
-                onClick={() => setIsMaximized((m) => !m)}
-                title={isMaximized ? "Minimize" : "Maximize"}
-              >
-                <img
-                  src={expandIcon}
-                  alt={isMaximized ? "Minimize" : "Maximize"}
-                  style={{ width: 24, height: 24 }}
-                />
-              </button>
-              {/* Center: White chat bubble icon */}
-              <div className="chatbot-center-icon">
+            {/* LeadBot-Style Header */}
+            <div className="chatbot-top-header">
+              <div className="header-left">
                 <button
-                  className="chat-center-btn"
-                  onClick={() => setIsOpen(false)}
-                  title="Minimize"
+                  className="expand-btn"
+                  onClick={() => setIsMaximized((m) => !m)}
+                  title={isMaximized ? "Minimize" : "Maximize"}
                 >
-                  {/* SVG chat bubble */}
-                  <svg width="28" height="28" fill="none" viewBox="0 0 28 28">
-                    <rect x="2" y="4" width="24" height="18" rx="5" fill="#fff" stroke="#b2dfdb" strokeWidth="2" />
-                    <circle cx="8" cy="13" r="1.5" fill="#b2dfdb" />
-                    <circle cx="14" cy="13" r="1.5" fill="#b2dfdb" />
-                    <circle cx="20" cy="13" r="1.5" fill="#b2dfdb" />
-                  </svg>
+                  <img src={expandIcon} alt="Toggle size" width={20} height={20} />
+                </button>
+              </div>
+              <div className="header-center">
+                <img src={botProfile} alt="Bot Avatar" className="bot-avatar" />
+                <div className="bot-details">
+                  <div className="bot-name">DentalBot</div>
+                  <div className="bot-status">🟢 Online Now</div>
+                </div>
+              </div>
+              <div className="header-right">
+                <button className="minimize-btn" onClick={() => setIsOpen(false)} title="Close">
+                  ✕
                 </button>
               </div>
             </div>
-            {/* Title */}
-            <h2 className="text-center text-lg font-bold text-[#004d4d] mb-1 mt-8">
-              Dental AI Assistant
-            </h2>
-            {/* Messages */}
+
             <div className="messages-container">
               {messages.map((msg, i) => (
                 <div
                   key={i}
                   className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}
                 >
-                  {msg.sender === "bot" && (
-                    <div className="avatar">🦷</div>
-                  )}
-                  <div
-                    className={`chat-message ${msg.sender}`}
-                    style={{ whiteSpace: "pre-line" }}
-                  >
+                  {msg.sender === "bot" && ( <img src={botProfile} alt="Bot Avatar" className="message-avatar" />)}
+                  <div className={`chat-message ${msg.sender}`} style={{ whiteSpace: "pre-line" }}>
                     {msg.text}
                   </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
-            {/* Input bar */}
+
             <div className="chat-input-row">
               <input
                 className="chat-input"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Describe your symptom"
+                placeholder="Reply to DentalBot..."
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
               <button className="send-btn" onClick={handleSend}>
