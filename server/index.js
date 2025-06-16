@@ -4,11 +4,12 @@ const dotenv = require("dotenv");
 const { OpenAI } = require("openai");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 const app = express();
 
-console.log("\uD83E\uDDEA API Key Loaded:", !!process.env.OPENAI_API_KEY);
+console.log("🧪 API Key Loaded:", !!process.env.OPENAI_API_KEY);
 
 app.use(cors({
   origin: "http://localhost:3000",
@@ -16,7 +17,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type"]
 }));
 app.use(express.json());
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const allowedTypes = [
@@ -40,9 +40,12 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const mime = file.mimetype;
     const size = parseInt(req.headers["content-length"] || "0");
+
     const isImage = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic"].includes(mime);
-    const isDoc = ["application/pdf", "application/msword",
-                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(mime);
+    const isDoc = [
+      "application/pdf", "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ].includes(mime);
 
     if (isImage && size > 2 * 1024 * 1024)
       return cb(new Error("Image files must be 2MB or less"));
@@ -55,15 +58,13 @@ const upload = multer({
   }
 });
 
-let lastUploadedFileUrl = "";
+let lastUploadedFilePath = "";
 
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded or invalid type" });
-  const filePath = `uploads/${req.file.filename}`;
-  const fullUrl = `https://dental-chatbot-backend.onrender.com/${filePath}`;
-  lastUploadedFileUrl = fullUrl;
-  console.log("\uD83D\uDCCE Uploaded File:", fullUrl);
-  res.json({ filePath });
+  lastUploadedFilePath = req.file.path;
+  console.log("📎 Uploaded File Path:", lastUploadedFilePath);
+  res.json({ filePath: req.file.filename });
 });
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -72,13 +73,19 @@ app.options("/chat", cors());
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  console.log("\u2705 Incoming message:", message);
+  console.log("✅ Incoming message:", message);
+
   try {
     let payload;
-    const wantsImageAnalysis = message.toLowerCase().includes("analyze") && lastUploadedFileUrl;
+
+    const wantsImageAnalysis = message.toLowerCase().includes("analyze") && lastUploadedFilePath;
 
     if (wantsImageAnalysis) {
-      console.log("\uD83E\uDDE0 Sending GPT-4o image analysis request...");
+      console.log("🧠 Preparing image for GPT-4o...");
+
+      const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
+      const base64Image = imageBuffer.toString("base64");
+
       payload = {
         model: "gpt-4o",
         messages: [
@@ -86,7 +93,12 @@ app.post("/chat", async (req, res) => {
             role: "user",
             content: [
               { type: "text", content: "Please analyze this image." },
-              { type: "image_url", image_url: { url: lastUploadedFileUrl } }
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
             ]
           }
         ],
@@ -99,13 +111,13 @@ app.post("/chat", async (req, res) => {
       };
     }
 
-    console.log("\uD83D\uDCEC Payload sent to OpenAI:", JSON.stringify(payload, null, 2));
+    console.log("📤 Sending to OpenAI...");
     const response = await openai.chat.completions.create(payload);
     const reply = response.choices[0].message.content;
-    console.log("\uD83E\uDD16 GPT Reply:", reply);
+    console.log("🤖 GPT Reply:", reply);
     res.json({ reply });
   } catch (err) {
-    console.error("\u274C OpenAI API Error:", err.response?.data || err.message);
+    console.error("❌ OpenAI API Error:", err.response?.data || err.message);
     res.status(500).json({ error: "OpenAI error" });
   }
 });
@@ -118,4 +130,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = 5050;
-app.listen(PORT, () => console.log(`\uD83D\uDE80 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
