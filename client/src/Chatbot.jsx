@@ -11,7 +11,6 @@ export default function Chatbot() {
   const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
-  const [lastImageUploaded, setLastImageUploaded] = useState(false);
   const messagesEndRef = useRef(null);
 
   const handleSend = async (overrideText) => {
@@ -65,7 +64,8 @@ export default function Chatbot() {
       });
 
       const data = await res.json();
-      const imageUrl = `http://localhost:5050/${data.filePath}`;
+      const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
+
       setMessages((prev) => [
         ...prev,
         {
@@ -74,9 +74,7 @@ export default function Chatbot() {
           isImage: true
         }
       ]);
-      setLastImageUploaded(true);
 
-      // Wait for UI update, then send image analysis
       setTimeout(() => {
         handleSend("analyze this image");
       }, 800);
