@@ -8,8 +8,7 @@ const path = require("path");
 dotenv.config();
 const app = express();
 
-// 🔍 DEBUG: Check if API key is loaded
-console.log("🧪 API Key Loaded:", !!process.env.OPENAI_API_KEY);
+console.log("\uD83E\uDDEA API Key Loaded:", !!process.env.OPENAI_API_KEY);
 
 app.use(cors({
   origin: "http://localhost:3000",
@@ -18,31 +17,21 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Allowed MIME types for upload
 const allowedTypes = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/heic",
-  "application/pdf",
-  "application/msword",
+  "image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic",
+  "application/pdf", "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "text/plain",
-  "application/rtf"
+  "text/plain", "application/rtf"
 ];
 
-// Set up Multer storage and file filter
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "uploads"));
   },
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
+    cb(null, Date.now() + "-" + file.originalname);
   }
 });
 
@@ -51,67 +40,45 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const mime = file.mimetype;
     const size = parseInt(req.headers["content-length"] || "0");
+    const isImage = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic"].includes(mime);
+    const isDoc = ["application/pdf", "application/msword",
+                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(mime);
 
-    const isImage = [
-      "image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic"
-    ].includes(mime);
-
-    const isDoc = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ].includes(mime);
-
-    if (isImage && size > 2 * 1024 * 1024) {
+    if (isImage && size > 2 * 1024 * 1024)
       return cb(new Error("Image files must be 2MB or less"));
-    }
-    if (isDoc && size > 5 * 1024 * 1024) {
+    if (isDoc && size > 5 * 1024 * 1024)
       return cb(new Error("Document files must be 5MB or less"));
-    }
-
-    if (!isImage && !isDoc && mime !== "text/plain" && mime !== "application/rtf") {
+    if (!isImage && !isDoc && mime !== "text/plain" && mime !== "application/rtf")
       return cb(new Error("Unsupported file type"));
-    }
 
     cb(null, true);
   }
 });
 
-// Track the last uploaded image URL
 let lastUploadedFileUrl = "";
 
-// Upload endpoint
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded or invalid type" });
-
   const filePath = `uploads/${req.file.filename}`;
   const fullUrl = `https://dental-chatbot-backend.onrender.com/${filePath}`;
   lastUploadedFileUrl = fullUrl;
-  console.log("📎 Uploaded File:", fullUrl);
+  console.log("\uD83D\uDCCE Uploaded File:", fullUrl);
   res.json({ filePath });
 });
 
-// OpenAI setup
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Chat endpoint
 app.options("/chat", cors());
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  console.log("✅ Incoming message:", message);
-
+  console.log("\u2705 Incoming message:", message);
   try {
     let payload;
-
-    const wantsImageAnalysis =
-      message.toLowerCase().includes("analyze") && lastUploadedFileUrl;
+    const wantsImageAnalysis = message.toLowerCase().includes("analyze") && lastUploadedFileUrl;
 
     if (wantsImageAnalysis) {
-      console.log("🧠 Sending GPT-4o image analysis request...");
-
+      console.log("\uD83E\uDDE0 Sending GPT-4o image analysis request...");
       payload = {
         model: "gpt-4o",
         messages: [
@@ -119,16 +86,11 @@ app.post("/chat", async (req, res) => {
             role: "user",
             content: [
               { type: "text", content: "Please analyze this image." },
-              {
-                type: "image_url",
-                image_url: {
-                  url: lastUploadedFileUrl
-                }
-              }
+              { type: "image_url", image_url: { url: lastUploadedFileUrl } }
             ]
           }
         ],
-        response_format: "text" // <--- Ensures compatibility with basic usage
+        response_format: "text"
       };
     } else {
       payload = {
@@ -137,19 +99,17 @@ app.post("/chat", async (req, res) => {
       };
     }
 
-    console.log("📤 Payload sent to OpenAI:", JSON.stringify(payload, null, 2));
-
+    console.log("\uD83D\uDCEC Payload sent to OpenAI:", JSON.stringify(payload, null, 2));
     const response = await openai.chat.completions.create(payload);
     const reply = response.choices[0].message.content;
-    console.log("🤖 GPT Reply:", reply);
+    console.log("\uD83E\uDD16 GPT Reply:", reply);
     res.json({ reply });
   } catch (err) {
-    console.error("❌ OpenAI API Error:", err.response?.data || err.message);
+    console.error("\u274C OpenAI API Error:", err.response?.data || err.message);
     res.status(500).json({ error: "OpenAI error" });
   }
 });
 
-// Handle upload/format errors
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError || err.message.includes("file")) {
     return res.status(400).json({ error: err.message });
@@ -158,4 +118,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = 5050;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`\uD83D\uDE80 Server running on port ${PORT}`));

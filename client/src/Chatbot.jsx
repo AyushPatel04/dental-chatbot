@@ -75,9 +75,10 @@ export default function Chatbot() {
         }
       ]);
 
+      // Delay to ensure message is visible before analyzing
       setTimeout(() => {
         handleSend("analyze this image");
-      }, 800);
+      }, 1200);
     } catch (err) {
       console.error("Image upload failed:", err);
     }
