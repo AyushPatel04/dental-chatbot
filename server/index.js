@@ -86,24 +86,23 @@ app.post("/chat", async (req, res) => {
       const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
       const base64Image = imageBuffer.toString("base64");
 
-      payload = {
-        model: "gpt-4o",
-        messages: [
+  payload = {
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", content: "Please analyze this image." },
           {
-            role: "user",
-            content: [
-              { type: "text", content: "Please analyze this image." },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64Image}`
-                }
-              }
-            ]
+            type: "image_url",
+            image_url: {
+              url: lastUploadedFileUrl
+            }
           }
-        ],
-        response_format: "text"
-      };
+        ]
+      }
+    ]
+  };
     } else {
       payload = {
         model: "gpt-3.5-turbo",
