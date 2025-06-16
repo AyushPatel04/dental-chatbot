@@ -11,35 +11,23 @@ export default function Chatbot() {
   const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
+  const [lastImageUploaded, setLastImageUploaded] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const lowerInput = input.trim().toLowerCase();
-    const userMessage = { text: input, sender: "user" };
+  const handleSend = async (overrideText) => {
+    const messageToSend = overrideText ?? input.trim();
+    if (!messageToSend) return;
+
+    const userMessage = { text: messageToSend, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setUserMessageCount((count) => count + 1);
 
-    if (
-      appointmentPrompted &&
-      (lowerInput.includes("yes") || lowerInput.includes("sure") || lowerInput.includes("okay"))
-    ) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: "Great! You can set your appointment here: [Google Form Link]",
-          sender: "bot"
-        }
-      ]);
-      return;
-    }
-
     try {
-      const res = await fetch("http://localhost:5050/chat", {
+      const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: messageToSend }),
       });
 
       const data = await res.json();
@@ -63,6 +51,40 @@ export default function Chatbot() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("https://dental-chatbot-backend.onrender.com/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      const imageUrl = `http://localhost:5050/${data.filePath}`;
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: imageUrl,
+          sender: "user",
+          isImage: true
+        }
+      ]);
+      setLastImageUploaded(true);
+
+      // Wait for UI update, then send image analysis
+      setTimeout(() => {
+        handleSend("analyze this image");
+      }, 800);
+    } catch (err) {
+      console.error("Image upload failed:", err);
+    }
+  };
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -80,14 +102,9 @@ export default function Chatbot() {
       {isOpen && (
         <div className={`chatbot-container${isMaximized ? " maximized" : ""}`}>
           <div className="chatbot-ui">
-            {/* LeadBot-Style Header */}
             <div className="chatbot-top-header">
               <div className="header-left">
-                <button
-                  className="expand-btn"
-                  onClick={() => setIsMaximized((m) => !m)}
-                  title={isMaximized ? "Minimize" : "Maximize"}
-                >
+                <button className="expand-btn" onClick={() => setIsMaximized((m) => !m)}>
                   <img src={expandIcon} alt="Toggle size" width={20} height={20} />
                 </button>
               </div>
@@ -99,9 +116,7 @@ export default function Chatbot() {
                 </div>
               </div>
               <div className="header-right">
-                <button className="minimize-btn" onClick={() => setIsOpen(false)} title="Close">
-                  ✕
-                </button>
+                <button className="minimize-btn" onClick={() => setIsOpen(false)}>✕</button>
               </div>
             </div>
 
@@ -111,9 +126,13 @@ export default function Chatbot() {
                   key={i}
                   className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}
                 >
-                  {msg.sender === "bot" && ( <img src={botProfile} alt="Bot Avatar" className="message-avatar" />)}
+                  {msg.sender === "bot" && <img src={botProfile} alt="Bot Avatar" className="message-avatar" />}
                   <div className={`chat-message ${msg.sender}`} style={{ whiteSpace: "pre-line" }}>
-                    {msg.text}
+                    {msg.isImage ? (
+                      <img src={msg.text} alt="User upload" style={{ maxWidth: "200px", borderRadius: "8px" }} />
+                    ) : (
+                      msg.text
+                    )}
                   </div>
                 </div>
               ))}
@@ -129,7 +148,15 @@ export default function Chatbot() {
                 placeholder="Reply to DentalBot..."
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
-              <button className="send-btn" onClick={handleSend}>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.heic,.pdf,.doc,.docx,.txt,.rtf"
+                id="fileUpload"
+                style={{ display: "none" }}
+                onChange={handleImageUpload}
+              />
+              <label htmlFor="fileUpload" className="upload-btn" title="Upload file">📎</label>
+              <button className="send-btn" onClick={() => handleSend()}>
                 Send
               </button>
             </div>
