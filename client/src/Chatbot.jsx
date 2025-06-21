@@ -72,13 +72,12 @@ export default function Chatbot() {
           text: imageUrl,
           sender: "user",
           isImage: true
+        },
+        {
+          text: "Image uploaded. Feel free to ask a question about it!",
+          sender: "bot"
         }
       ]);
-
-      // Delay to ensure message is visible before analyzing
-      setTimeout(() => {
-        handleSend("analyze this image");
-      }, 1200);
     } catch (err) {
       console.error("Image upload failed:", err);
     }
