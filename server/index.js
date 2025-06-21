@@ -72,16 +72,17 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.options("/chat", cors());
 
 app.post("/chat", async (req, res) => {
-  const { message, imageUrl } = req.body;
+  const { message } = req.body;
   console.log("✅ Incoming message:", message);
-  console.log("🖼️ Image URL provided:", imageUrl);
 
   try {
     let payload;
+    const wantsImageAnalysis = lastUploadedFilePath;
 
-    if (imageUrl) {
-      const localPath = path.join(__dirname, imageUrl.replace(/^.*\/uploads\//, "uploads/"));
-      const imageBuffer = fs.readFileSync(localPath);
+    if (wantsImageAnalysis) {
+      console.log("🧠 Preparing image for GPT-4o...");
+
+      const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
       const base64Image = imageBuffer.toString("base64");
 
       const safeText =
@@ -95,8 +96,16 @@ app.post("/chat", async (req, res) => {
           {
             role: "user",
             content: [
-              { type: "text", text: safeText },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+              {
+                type: "text",
+                text: safeText
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
             ]
           }
         ]
@@ -108,8 +117,10 @@ app.post("/chat", async (req, res) => {
       };
     }
 
+    console.log("📤 Sending to OpenAI...");
     const response = await openai.chat.completions.create(payload);
     const reply = response.choices[0].message.content;
+    console.log("🤖 GPT Reply:", reply);
     res.json({ reply });
   } catch (err) {
     console.error("❌ OpenAI API Error:", err.response?.data || err.message);
