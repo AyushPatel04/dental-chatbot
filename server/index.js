@@ -72,13 +72,12 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.options("/chat", cors());
 
 app.post("/chat", async (req, res) => {
-  const { message = "" } = req.body;
+  const { message } = req.body;
   console.log("✅ Incoming message:", message);
 
   try {
     let payload;
-
-    const wantsImageAnalysis = !message.trim() && lastUploadedFilePath;
+    const wantsImageAnalysis = lastUploadedFilePath;
 
     if (wantsImageAnalysis) {
       console.log("🧠 Preparing image for GPT-4o...");
@@ -92,6 +91,10 @@ app.post("/chat", async (req, res) => {
           {
             role: "user",
             content: [
+              {
+                type: "text",
+                content: message?.trim() || "Please analyze this image."
+              },
               {
                 type: "image_url",
                 image_url: {
