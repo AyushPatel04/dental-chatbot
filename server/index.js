@@ -85,9 +85,10 @@ app.post("/chat", async (req, res) => {
       const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
       const base64Image = imageBuffer.toString("base64");
 
-      const messageText = typeof message === "string" && message.trim().length > 0
-        ? message.trim()
-        : "Please analyze this image.";
+      const safeText =
+        typeof message === "string" && message.trim().length > 0
+          ? message.trim()
+          : "Please analyze this image.";
 
       payload = {
         model: "gpt-4o",
@@ -97,7 +98,7 @@ app.post("/chat", async (req, res) => {
             content: [
               {
                 type: "text",
-                content: messageText
+                content: safeText
               },
               {
                 type: "image_url",
@@ -112,7 +113,7 @@ app.post("/chat", async (req, res) => {
     } else {
       payload = {
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: String(message) }]
+        messages: [{ role: "user", content: String(message || "") }]
       };
     }
 
