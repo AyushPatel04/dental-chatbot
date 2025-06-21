@@ -98,7 +98,7 @@ app.post("/chat", async (req, res) => {
             content: [
               {
                 type: "text",
-                text: safeText
+                content: safeText
               },
               {
                 type: "image_url",
