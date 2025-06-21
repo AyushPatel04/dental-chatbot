@@ -11,14 +11,23 @@ export default function Chatbot() {
   const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
+  const [lastImagePath, setLastImagePath] = useState(null);
   const messagesEndRef = useRef(null);
 
   const handleSend = async (overrideText) => {
     const messageToSend = overrideText ?? input.trim();
-    if (!messageToSend) return;
+    if (!messageToSend && !lastImagePath) return;
 
     const userMessage = { text: messageToSend, sender: "user" };
-    setMessages((prev) => [...prev, userMessage]);
+    const imageMessage = lastImagePath
+      ? { text: lastImagePath, sender: "user", isImage: true }
+      : null;
+
+    setMessages((prev) => [
+      ...prev,
+      ...(imageMessage ? [imageMessage] : []),
+      userMessage,
+    ]);
     setInput("");
     setUserMessageCount((count) => count + 1);
 
@@ -26,12 +35,16 @@ export default function Chatbot() {
       const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageToSend }),
+        body: JSON.stringify({
+          message: messageToSend,
+          imageUrl: lastImagePath
+        }),
       });
 
       const data = await res.json();
       const botMessage = { text: data.reply, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
+      setLastImagePath(null);
 
       if (userMessageCount + 1 === 3 && !appointmentPrompted) {
         setTimeout(() => {
@@ -65,19 +78,7 @@ export default function Chatbot() {
 
       const data = await res.json();
       const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: imageUrl,
-          sender: "user",
-          isImage: true
-        },
-        {
-          text: "Image uploaded. Feel free to ask a question about it!",
-          sender: "bot"
-        }
-      ]);
+      setLastImagePath(imageUrl); // Store for next message
     } catch (err) {
       console.error("Image upload failed:", err);
     }
@@ -148,7 +149,7 @@ export default function Chatbot() {
               />
               <input
                 type="file"
-                accept=".jpg,.jpeg,.png,.gif,.heic,.pdf,.doc,.docx,.txt,.rtf"
+                accept=".jpg,.jpeg,.png,.gif,.heic"
                 id="fileUpload"
                 style={{ display: "none" }}
                 onChange={handleImageUpload}
