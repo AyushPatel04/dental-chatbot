@@ -85,6 +85,10 @@ app.post("/chat", async (req, res) => {
       const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
       const base64Image = imageBuffer.toString("base64");
 
+      const messageText = typeof message === "string" && message.trim().length > 0
+        ? message.trim()
+        : "Please analyze this image.";
+
       payload = {
         model: "gpt-4o",
         messages: [
@@ -93,7 +97,7 @@ app.post("/chat", async (req, res) => {
             content: [
               {
                 type: "text",
-                content: message?.trim() || "Please analyze this image."
+                content: messageText
               },
               {
                 type: "image_url",
