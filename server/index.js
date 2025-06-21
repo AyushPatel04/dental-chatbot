@@ -77,8 +77,7 @@ app.post("/chat", async (req, res) => {
 
   try {
     let payload;
-
-    const wantsImageAnalysis = message.toLowerCase().includes("analyze") && lastUploadedFilePath;
+    const wantsImageAnalysis = message?.toLowerCase().includes("analyze") && lastUploadedFilePath;
 
     if (wantsImageAnalysis) {
       console.log("🧠 Preparing image for GPT-4o...");
@@ -86,27 +85,27 @@ app.post("/chat", async (req, res) => {
       const imageBuffer = fs.readFileSync(path.resolve(__dirname, lastUploadedFilePath));
       const base64Image = imageBuffer.toString("base64");
 
-  payload = {
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", content: "Please analyze this image." },
+      payload = {
+        model: "gpt-4o",
+        messages: [
           {
-            type: "image_url",
-            image_url: {
-              url: `data:image/jpeg;base64,${base64Image}`
-            }
+            role: "user",
+            content: [
+              { type: "text", content: "Please analyze this image." },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
+            ]
           }
         ]
-      }
-    ]
-  };
+      };
     } else {
       payload = {
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: message }]
+        messages: [{ role: "user", content: String(message) }]
       };
     }
 
