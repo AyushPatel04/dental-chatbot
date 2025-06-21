@@ -96,7 +96,7 @@ app.post("/chat", async (req, res) => {
           {
             type: "image_url",
             image_url: {
-              url: lastUploadedFileUrl
+              url: `data:image/jpeg;base64,${base64Image}`
             }
           }
         ]
