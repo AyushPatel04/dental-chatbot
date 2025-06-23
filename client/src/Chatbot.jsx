@@ -142,11 +142,13 @@ export default function Chatbot() {
             </div>
 
             {previewImage && (
-              <div className="image-preview">
-                <img src={previewImage.url} alt="Preview" style={{ maxWidth: "100px", borderRadius: "8px" }} />
-                <div>
-                  <span>Preview</span>
-                  <button onClick={() => setPreviewImage(null)} className="remove-btn">❌</button>
+              <div className="preview-wrapper">
+                <div className="preview-image-card">
+                  <img src={previewImage.url} alt="Preview" className="preview-thumb" />
+                  <div className="preview-info">
+                    <span className="preview-label">Image ready to send</span>
+                    <button onClick={() => setPreviewImage(null)} className="preview-remove">❌</button>
+                  </div>
                 </div>
               </div>
             )}

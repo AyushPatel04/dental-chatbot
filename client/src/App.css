@@ -326,5 +326,52 @@ h2 {
   justify-content: center;
 }
 
+.preview-wrapper {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.preview-image-card {
+  display: flex;
+  align-items: center;
+  background: #eef7f7;
+  border: 1px solid #d0e4e4;
+  border-radius: 12px;
+  padding: 8px 12px;
+  gap: 12px;
+  max-width: 280px;
+}
+
+.preview-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.preview-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.preview-label {
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.preview-remove {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #c00;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+
 
 
