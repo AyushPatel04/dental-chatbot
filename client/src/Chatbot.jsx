@@ -7,6 +7,7 @@ export default function Chatbot() {
     { text: "Hi! What brings you in today?", sender: "bot" }
   ]);
   const [input, setInput] = useState("");
+  const [uploadedImagePath, setUploadedImagePath] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
@@ -15,10 +16,12 @@ export default function Chatbot() {
 
   const handleSend = async (overrideText) => {
     const messageToSend = overrideText ?? input.trim();
-    if (!messageToSend) return;
+    if (!messageToSend && !uploadedImagePath) return;
 
-    const userMessage = { text: messageToSend, sender: "user" };
-    setMessages((prev) => [...prev, userMessage]);
+    if (messageToSend) {
+      setMessages((prev) => [...prev, { text: messageToSend, sender: "user" }]);
+    }
+
     setInput("");
     setUserMessageCount((count) => count + 1);
 
@@ -30,23 +33,21 @@ export default function Chatbot() {
       });
 
       const data = await res.json();
-      const botMessage = { text: data.reply, sender: "bot" };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) => [...prev, { text: data.reply, sender: "bot" }]);
 
       if (userMessageCount + 1 === 3 && !appointmentPrompted) {
         setTimeout(() => {
           setMessages((prev) => [
             ...prev,
-            {
-              text: "Would you like to set an appointment with us?",
-              sender: "bot",
-            },
+            { text: "Would you like to set an appointment with us?", sender: "bot" }
           ]);
           setAppointmentPrompted(true);
         }, 800);
       }
     } catch (err) {
       console.error("Error contacting AI server:", err);
+    } finally {
+      setUploadedImagePath(null);
     }
   };
 
@@ -65,6 +66,7 @@ export default function Chatbot() {
 
       const data = await res.json();
       const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
+      setUploadedImagePath(imageUrl);
 
       setMessages((prev) => [
         ...prev,
@@ -72,10 +74,6 @@ export default function Chatbot() {
           text: imageUrl,
           sender: "user",
           isImage: true
-        },
-        {
-          text: "Image uploaded. Feel free to ask a question about it!",
-          sender: "bot"
         }
       ]);
     } catch (err) {
