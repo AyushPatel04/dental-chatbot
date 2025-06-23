@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import expandIcon from "./assets/expand.png";
 import botProfile from "./assets/botProfile.png";
@@ -20,7 +19,25 @@ export default function Chatbot() {
     if (!messageToSend && !previewImage) return;
 
     const newMessages = [];
-    if (messageToSend) newMessages.push({ text: messageToSend, sender: "user" });
+    if (messageToSend) {
+      newMessages.push({ text: messageToSend, sender: "user" });
+    }
+
+    if (previewImage) {
+      const tempImageMessage = {
+        text: previewImage.url,
+        sender: "user",
+        isImage: true,
+        temp: true
+      };
+      newMessages.push(tempImageMessage);
+    }
+
+    if (newMessages.length > 0) {
+      setMessages((prev) => [...prev, ...newMessages]);
+      setUserMessageCount((count) => count + 1);
+      setInput("");
+    }
 
     if (previewImage) {
       const formData = new FormData();
@@ -34,18 +51,17 @@ export default function Chatbot() {
 
         const data = await res.json();
         const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
-        newMessages.push({ text: imageUrl, sender: "user", isImage: true });
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.temp ? { ...msg, text: imageUrl, temp: false } : msg
+          )
+        );
       } catch (err) {
         console.error("Image upload failed:", err);
       }
 
       setPreviewImage(null);
-    }
-
-    if (newMessages.length > 0) {
-      setMessages((prev) => [...prev, ...newMessages]);
-      setUserMessageCount((count) => count + 1);
-      setInput("");
     }
 
     try {
