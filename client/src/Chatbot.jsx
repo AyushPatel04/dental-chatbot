@@ -45,7 +45,9 @@ export default function Chatbot() {
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === tempId ? { ...msg, text: finalImageUrl } : msg
+            msg.id === tempId
+              ? { ...msg, text: finalImageUrl, isImage: true, id: tempId }
+              : msg
           )
         );
       } catch (err) {
