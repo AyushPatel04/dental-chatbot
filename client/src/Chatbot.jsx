@@ -1,3 +1,4 @@
+// Chatbot.jsx
 import { useState, useRef, useEffect } from "react";
 import expandIcon from "./assets/expand.png";
 import botProfile from "./assets/botProfile.png";
@@ -10,6 +11,7 @@ export default function Chatbot() {
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -87,6 +89,14 @@ export default function Chatbot() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      setErrorMessage("Image must be 2MB or less.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+
     const imageUrl = URL.createObjectURL(file);
     setPreviewImage({ file, url: imageUrl });
     if (fileInputRef.current) fileInputRef.current.value = null;
@@ -104,6 +114,7 @@ export default function Chatbot() {
       {isOpen && (
         <div className={`chatbot-container${isMaximized ? " maximized" : ""}`}>
           <div className="chatbot-ui">
+            {errorMessage && <div className="toast-error">{errorMessage}</div>}
             <div className="chatbot-top-header">
               <div className="header-left">
                 <button className="expand-btn" onClick={() => setIsMaximized((m) => !m)}>
@@ -142,13 +153,16 @@ export default function Chatbot() {
             </div>
 
             {previewImage && (
-              <div className="preview-wrapper">
-                <div className="preview-image-card">
-                  <img src={previewImage.url} alt="Preview" className="preview-thumb" />
-                  <div className="preview-info">
-                    <span className="preview-label">Image ready to send</span>
-                    <button onClick={() => setPreviewImage(null)} className="preview-remove">❌</button>
-                  </div>
+              <div className="preview-image-wrapper">
+                <div className="preview-image-box">
+                  <img
+                    src={previewImage.url}
+                    alt="Preview"
+                    className="preview-img-small"
+                    onClick={() => setPreviewImage(null)}
+                    title="Click to remove"
+                  />
+                  <button className="preview-remove-btn" onClick={() => setPreviewImage(null)}>✕</button>
                 </div>
               </div>
             )}
