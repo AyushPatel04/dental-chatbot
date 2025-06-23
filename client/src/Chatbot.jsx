@@ -19,7 +19,6 @@ export default function Chatbot() {
 
     let finalImageUrl = null;
 
-    // 1. Handle Image Upload
     if (previewImage) {
       const tempId = Date.now();
       const tempImageMessage = {
@@ -54,15 +53,13 @@ export default function Chatbot() {
       setPreviewImage(null);
     }
 
-    // 2. Handle User Message
     if (messageToSend) {
-      setMessages((prev) => [...prev, { sender: "user", text: messageToSend }]);
+      setMessages((prev) => [...prev, { sender: "user", text: messageToSend, isImage: false }]);
     }
 
     setUserMessageCount((count) => count + 1);
     setInput("");
 
-    // 3. Send to Backend
     try {
       const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
         method: "POST",
@@ -107,7 +104,6 @@ export default function Chatbot() {
       {isOpen && (
         <div className={`chatbot-container${isMaximized ? " maximized" : ""}`}>
           <div className="chatbot-ui">
-            {/* Header */}
             <div className="chatbot-top-header">
               <div className="header-left">
                 <button className="expand-btn" onClick={() => setIsMaximized((m) => !m)}>
@@ -126,7 +122,6 @@ export default function Chatbot() {
               </div>
             </div>
 
-            {/* Messages */}
             <div className="messages-container">
               {messages.map((msg, i) => (
                 <div key={i} className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}>
@@ -137,6 +132,7 @@ export default function Chatbot() {
                         src={msg.text}
                         alt="Uploaded"
                         style={{ maxWidth: "200px", borderRadius: "8px" }}
+                        onError={(e) => e.target.remove()}
                       />
                     ) : msg.text}
                   </div>
@@ -145,7 +141,6 @@ export default function Chatbot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Image Preview */}
             {previewImage && (
               <div className="image-preview">
                 <img src={previewImage.url} alt="Preview" style={{ maxWidth: "100px", borderRadius: "8px" }} />
@@ -156,7 +151,6 @@ export default function Chatbot() {
               </div>
             )}
 
-            {/* Input */}
             <div className="chat-input-row">
               <input
                 className="chat-input"
