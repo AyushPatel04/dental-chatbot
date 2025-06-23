@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import expandIcon from "./assets/expand.png";
 import botProfile from "./assets/botProfile.png";
@@ -11,31 +12,47 @@ export default function Chatbot() {
   const [isMaximized, setIsMaximized] = useState(false);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const messagesEndRef = useRef(null);
 
-  const handleSend = async () => {
-    if (!input.trim() && !uploadedImage) return;
+  const handleSend = async (overrideText) => {
+    const messageToSend = overrideText ?? input.trim();
+    if (!messageToSend && !previewImage) return;
 
-    const userMessage = {
-      text: input.trim() || "[Image]",
-      sender: "user",
-      isImage: Boolean(uploadedImage),
-      imageUrl: uploadedImage
-    };
+    const newMessages = [];
+    if (messageToSend) newMessages.push({ text: messageToSend, sender: "user" });
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setUploadedImage(null);
-    setUserMessageCount((count) => count + 1);
+    if (previewImage) {
+      const formData = new FormData();
+      formData.append("image", previewImage.file);
 
-    const payload = { message: input.trim(), imageUrl: uploadedImage };
+      try {
+        const res = await fetch("https://dental-chatbot-backend.onrender.com/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
+        newMessages.push({ text: imageUrl, sender: "user", isImage: true });
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      }
+
+      setPreviewImage(null);
+    }
+
+    if (newMessages.length > 0) {
+      setMessages((prev) => [...prev, ...newMessages]);
+      setUserMessageCount((count) => count + 1);
+      setInput("");
+    }
 
     try {
       const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ message: messageToSend }),
       });
 
       const data = await res.json();
@@ -46,10 +63,7 @@ export default function Chatbot() {
         setTimeout(() => {
           setMessages((prev) => [
             ...prev,
-            {
-              text: "Would you like to set an appointment with us?",
-              sender: "bot",
-            },
+            { text: "Would you like to set an appointment with us?", sender: "bot" }
           ]);
           setAppointmentPrompted(true);
         }, 800);
@@ -59,25 +73,12 @@ export default function Chatbot() {
     }
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const res = await fetch("https://dental-chatbot-backend.onrender.com/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
-      setUploadedImage(imageUrl);
-    } catch (err) {
-      console.error("Image upload failed:", err);
-    }
+    const imageUrl = URL.createObjectURL(file);
+    setPreviewImage({ file, url: imageUrl });
   };
 
   useEffect(() => {
@@ -89,9 +90,7 @@ export default function Chatbot() {
   return (
     <>
       {!isOpen && (
-        <button className="chatbot-toggle" onClick={() => setIsOpen(true)}>
-          💬
-        </button>
+        <button className="chatbot-toggle" onClick={() => setIsOpen(true)}>💬</button>
       )}
 
       {isOpen && (
@@ -117,30 +116,29 @@ export default function Chatbot() {
 
             <div className="messages-container">
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}
-                >
+                <div key={i} className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}>
                   {msg.sender === "bot" && <img src={botProfile} alt="Bot Avatar" className="message-avatar" />}
                   <div className={`chat-message ${msg.sender}`} style={{ whiteSpace: "pre-line" }}>
-                    {msg.isImage && msg.imageUrl ? (
-                      <img src={msg.imageUrl} alt="User upload" style={{ maxWidth: "200px", borderRadius: "8px" }} />
-                    ) : (
-                      msg.text
-                    )}
+                    {msg.isImage ? (
+                      <img src={msg.text} alt="User upload" style={{ maxWidth: "200px", borderRadius: "8px" }} />
+                    ) : msg.text}
                   </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="chat-input-row">
-              {uploadedImage && (
-                <div className="image-preview">
-                  <img src={uploadedImage} alt="Preview" style={{ maxHeight: "100px" }} />
-                  <button onClick={() => setUploadedImage(null)}>❌</button>
+            {previewImage && (
+              <div className="image-preview">
+                <img src={previewImage.url} alt="Preview" style={{ maxWidth: "100px", borderRadius: "8px" }} />
+                <div>
+                  <span>Preview</span>
+                  <button onClick={() => setPreviewImage(null)} className="remove-btn">❌</button>
                 </div>
-              )}
+              </div>
+            )}
+
+            <div className="chat-input-row">
               <input
                 className="chat-input"
                 type="text"
@@ -157,7 +155,9 @@ export default function Chatbot() {
                 onChange={handleImageUpload}
               />
               <label htmlFor="fileUpload" className="upload-btn" title="Upload file">📎</label>
-              <button className="send-btn" onClick={handleSend}>Send</button>
+              <button className="send-btn" onClick={() => handleSend()}>
+                Send
+              </button>
             </div>
           </div>
         </div>
