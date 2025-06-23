@@ -41,7 +41,7 @@ export default function Chatbot() {
         });
 
         const data = await res.json();
-        finalImageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
+        finalImageUrl = data.url;
 
         setMessages((prev) =>
           prev.map((msg) =>
@@ -140,7 +140,12 @@ export default function Chatbot() {
                   {msg.sender === "bot" && <img src={botProfile} alt="Bot Avatar" className="message-avatar" />}
                   <div className={`chat-message ${msg.sender}`} style={{ whiteSpace: "pre-line" }}>
                     {msg.isImage ? (
-                      <img src={msg.text} alt="User upload" style={{ maxWidth: "200px", borderRadius: "8px" }} />
+                      <img
+                        src={msg.text}
+                        alt="User upload"
+                        onError={(e) => (e.target.style.display = "none")}
+                        style={{ maxWidth: "200px", borderRadius: "8px" }}
+                      />
                     ) : msg.text}
                   </div>
                 </div>
