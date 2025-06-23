@@ -13,33 +13,24 @@ export default function Chatbot() {
   const [appointmentPrompted, setAppointmentPrompted] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleSend = async (overrideText) => {
     const messageToSend = overrideText ?? input.trim();
     if (!messageToSend && !previewImage) return;
 
-    const newMessages = [];
-    if (messageToSend) {
-      newMessages.push({ text: messageToSend, sender: "user" });
-    }
+    let finalImageUrl = null;
 
     if (previewImage) {
+      const tempId = Date.now();
       const tempImageMessage = {
+        id: tempId,
         text: previewImage.url,
         sender: "user",
-        isImage: true,
-        temp: true
+        isImage: true
       };
-      newMessages.push(tempImageMessage);
-    }
+      setMessages((prev) => [...prev, tempImageMessage]);
 
-    if (newMessages.length > 0) {
-      setMessages((prev) => [...prev, ...newMessages]);
-      setUserMessageCount((count) => count + 1);
-      setInput("");
-    }
-
-    if (previewImage) {
       const formData = new FormData();
       formData.append("image", previewImage.file);
 
@@ -50,11 +41,11 @@ export default function Chatbot() {
         });
 
         const data = await res.json();
-        const imageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
+        finalImageUrl = `https://dental-chatbot-backend.onrender.com/${data.filePath}`;
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.temp ? { ...msg, text: imageUrl, temp: false } : msg
+            msg.id === tempId ? { ...msg, text: finalImageUrl } : msg
           )
         );
       } catch (err) {
@@ -64,16 +55,25 @@ export default function Chatbot() {
       setPreviewImage(null);
     }
 
+    if (messageToSend) {
+      setMessages((prev) => [...prev, { text: messageToSend, sender: "user" }]);
+    }
+
+    setUserMessageCount((count) => count + 1);
+    setInput("");
+
     try {
       const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageToSend }),
+        body: JSON.stringify({
+          message: messageToSend,
+          imageUrl: finalImageUrl
+        })
       });
 
       const data = await res.json();
-      const botMessage = { text: data.reply, sender: "bot" };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) => [...prev, { text: data.reply, sender: "bot" }]);
 
       if (userMessageCount + 1 === 3 && !appointmentPrompted) {
         setTimeout(() => {
@@ -95,6 +95,8 @@ export default function Chatbot() {
 
     const imageUrl = URL.createObjectURL(file);
     setPreviewImage({ file, url: imageUrl });
+
+    if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
   useEffect(() => {
@@ -169,6 +171,7 @@ export default function Chatbot() {
                 id="fileUpload"
                 style={{ display: "none" }}
                 onChange={handleImageUpload}
+                ref={fileInputRef}
               />
               <label htmlFor="fileUpload" className="upload-btn" title="Upload file">📎</label>
               <button className="send-btn" onClick={() => handleSend()}>
