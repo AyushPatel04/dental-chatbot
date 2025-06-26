@@ -1,0 +1,122 @@
+export const procedureCosts = {
+  "Routine Cleaning": {
+    "No Insurance": "$120",
+    "BrightSmile Basic": "$25",
+    "ToothCare Plus": "$0",
+    "HappyMouth Gold": "$0",
+  },
+  "Deep Cleaning": {
+    "No Insurance": "$300",
+    "BrightSmile Basic": "$90",
+    "ToothCare Plus": "$60",
+    "HappyMouth Gold": "$50",
+  },
+  "Dental Exam": {
+    "No Insurance": "$80",
+    "BrightSmile Basic": "$20",
+    "ToothCare Plus": "$0",
+    "HappyMouth Gold": "$0",
+  },
+  "X-Ray (Bitewing)": {
+    "No Insurance": "$100",
+    "BrightSmile Basic": "$30",
+    "ToothCare Plus": "$15",
+    "HappyMouth Gold": "$10",
+  },
+  "Fluoride Treatment": {
+    "No Insurance": "$45",
+    "BrightSmile Basic": "$20",
+    "ToothCare Plus": "$10",
+    "HappyMouth Gold": "$0",
+  },
+  "Filling (1 Surface)": {
+    "No Insurance": "$200",
+    "BrightSmile Basic": "$90",
+    "ToothCare Plus": "$70",
+    "HappyMouth Gold": "$50",
+  },
+  "Filling (2 Surfaces)": {
+    "No Insurance": "$250",
+    "BrightSmile Basic": "$110",
+    "ToothCare Plus": "$90",
+    "HappyMouth Gold": "$60",
+  },
+  "Tooth Extraction (Simple)": {
+    "No Insurance": "$180",
+    "BrightSmile Basic": "$75",
+    "ToothCare Plus": "$60",
+    "HappyMouth Gold": "$40",
+  },
+  "Tooth Extraction (Surgical)": {
+    "No Insurance": "$350",
+    "BrightSmile Basic": "$150",
+    "ToothCare Plus": "$120",
+    "HappyMouth Gold": "$100",
+  },
+  "Crown (Porcelain)": {
+    "No Insurance": "$1,000",
+    "BrightSmile Basic": "$600",
+    "ToothCare Plus": "$500",
+    "HappyMouth Gold": "$400",
+  },
+  "Crown (Metal)": {
+    "No Insurance": "$900",
+    "BrightSmile Basic": "$550",
+    "ToothCare Plus": "$450",
+    "HappyMouth Gold": "$350",
+  },
+  "Root Canal (Front Tooth)": {
+    "No Insurance": "$850",
+    "BrightSmile Basic": "$500",
+    "ToothCare Plus": "$400",
+    "HappyMouth Gold": "$350",
+  },
+  "Root Canal (Molar)": {
+    "No Insurance": "$1,100",
+    "BrightSmile Basic": "$650",
+    "ToothCare Plus": "$550",
+    "HappyMouth Gold": "$500",
+  },
+  "Dental Bridge": {
+    "No Insurance": "$2,400",
+    "BrightSmile Basic": "$1,500",
+    "ToothCare Plus": "$1,200",
+    "HappyMouth Gold": "$1,000",
+  },
+  "Teeth Whitening (In-Office)": {
+    "No Insurance": "$400",
+    "BrightSmile Basic": "$300",
+    "ToothCare Plus": "$250",
+    "HappyMouth Gold": "$200",
+  },
+  "Sealant (Per Tooth)": {
+    "No Insurance": "$50",
+    "BrightSmile Basic": "$30",
+    "ToothCare Plus": "$20",
+    "HappyMouth Gold": "$10",
+  },
+  "Mouth Guard (Night)": {
+    "No Insurance": "$500",
+    "BrightSmile Basic": "$300",
+    "ToothCare Plus": "$250",
+    "HappyMouth Gold": "$200",
+  },
+  "Denture (Full Upper or Lower)": {
+    "No Insurance": "$1,200",
+    "BrightSmile Basic": "$800",
+    "ToothCare Plus": "$700",
+    "HappyMouth Gold": "$600",
+  },
+  "Implant (Single Tooth)": {
+    "No Insurance": "$3,000",
+    "BrightSmile Basic": "$2,200",
+    "ToothCare Plus": "$2,000",
+    "HappyMouth Gold": "$1,800",
+  },
+  "Oral Cancer Screening": {
+    "No Insurance": "$100",
+    "BrightSmile Basic": "$40",
+    "ToothCare Plus": "$20",
+    "HappyMouth Gold": "$0",
+  }
+};
