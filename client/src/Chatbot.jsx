@@ -23,60 +23,64 @@ const [messages, setMessages] = useState([
   const [chatFlowStage, setChatFlowStage] = useState("start");
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", image: null });
 
-  const handleSend = async (overrideText) => {
-    const messageToSend = overrideText ?? input.trim();
-    if (!messageToSend && !previewImage) return;
+const handleSend = async (overrideText) => {
+  const messageToSend = overrideText ?? input.trim();
+  if (!messageToSend && !previewImage) return;
 
-    const lowered = messageToSend.toLowerCase();
+  const lowered = messageToSend.toLowerCase();
 
-    const yesResponses = [
-      "yes", "yeah", "yep", "yup", "yea", "ye", "y", "sure", "of course", "absolutely", "definitely", "ok", "okay"
-    ];
+  const yesResponses = [
+    "yes", "yeah", "yep", "yup", "yea", "ye", "y", "sure", "of course", "absolutely", "definitely", "ok", "okay"
+  ];
 
-    // ✅ First: handle if user is saying "yes" to an appointment confirmation
-    if (
-      chatFlowStage === "awaiting_appointment_confirmation" &&
-      yesResponses.includes(lowered)
-    ) {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        {
-          sender: "bot",
-          isComponent: true,
-          component: (
-            <span>
-              Great! You can book your appointment here:{" "}
-              <a
-                href="https://forms.gle/k1kHBp6HDrHpre1aA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                Book Now
-              </a>
-            </span>
-          )
-        }
-      ]);
-      setChatFlowStage("start");
-      setInput("");
-      return;
-    }
+  // ✅ Handle appointment confirmation
+  if (
+    chatFlowStage === "awaiting_appointment_confirmation" &&
+    yesResponses.includes(lowered)
+  ) {
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      {
+        sender: "bot",
+        isComponent: true,
+        component: (
+          <span>
+            Great! You can book your appointment here:{" "}
+            <a
+              href="https://forms.gle/k1kHBp6HDrHpre1aA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              Book Now
+            </a>
+          </span>
+        )
+      }
+    ]);
+    setChatFlowStage("start");
+    setInput("");
+    return;
+  }
 
-    // ✅ Then: trigger appointment prompt on keywords
-    if (!appointmentPrompted && (lowered.includes("appointment") || lowered.includes("book"))) {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        { sender: "bot", text: "Sure! Would you like to set an appointment with us?" }
-      ]);
-      setAppointmentPrompted(true);
-      setChatFlowStage("awaiting_appointment_confirmation");
-      setUserMessageCount((count) => count + 1);
-      setInput("");
-      return;
-    }
+  // ✅ Trigger appointment flow only on booking keywords
+  if (
+    chatFlowStage === "start" &&
+    !appointmentPrompted &&
+    (lowered.includes("appointment") || lowered.includes("book"))
+  ) {
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      { sender: "bot", text: "Sure! Would you like to set an appointment with us?" }
+    ]);
+    setAppointmentPrompted(true);
+    setChatFlowStage("awaiting_appointment_confirmation");
+    setUserMessageCount((count) => count + 1);
+    setInput("");
+    return;
+  }
 
     // Insurance logic
     if (chatFlowStage === "choose_insurance_path") {
