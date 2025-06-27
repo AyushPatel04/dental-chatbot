@@ -17,6 +17,7 @@ app.use(cors({
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// 🔹 Allow image uploads
 const allowedTypes = [
   "image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic"
 ];
@@ -44,6 +45,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   res.json({ filePath: req.file.filename, url: fullUrl });
 });
 
+// 🔹 OpenAI Chat Logic
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.post("/chat", async (req, res) => {
@@ -66,6 +68,32 @@ app.post("/chat", async (req, res) => {
     console.error("Error:", err);
     res.status(500).json({ error: "OpenAI error" });
   }
+});
+
+// 🔹 NEW: Log conversation history or feedback
+const LOG_FILE = path.join(__dirname, "logs.json");
+
+app.post("/log", (req, res) => {
+  const { messages, feedback, timestamp = new Date().toISOString() } = req.body;
+
+  // Load existing logs or start empty
+  fs.readFile(LOG_FILE, "utf8", (err, data) => {
+    const logs = err ? [] : JSON.parse(data || "[]");
+
+    const logEntry = feedback
+      ? { type: "feedback", feedback, timestamp }
+      : { type: "conversation", messages, timestamp };
+
+    logs.push(logEntry);
+
+    fs.writeFile(LOG_FILE, JSON.stringify(logs, null, 2), (err) => {
+      if (err) {
+        console.error("Error writing logs:", err);
+        return res.status(500).send("Failed to log");
+      }
+      res.send("Logged");
+    });
+  });
 });
 
 const PORT = 5050;

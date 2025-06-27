@@ -1,0 +1,30 @@
+[
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "can i book"
+      },
+      {
+        "sender": "bot",
+        "text": "Sure! Would you like to set an appointment with us?"
+      }
+    ],
+    "timestamp": "2025-06-27T19:25:17.878Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "hello"
+      },
+      {
+        "sender": "bot",
+        "text": "Hello! How can I assist you today?"
+      }
+    ],
+    "timestamp": "2025-06-27T19:25:20.068Z"
+  }
+]

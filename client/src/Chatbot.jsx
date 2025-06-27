@@ -23,177 +23,198 @@ const [messages, setMessages] = useState([
   const [chatFlowStage, setChatFlowStage] = useState("start");
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", image: null });
 
-  const handleSend = async (overrideText) => {
-    const messageToSend = overrideText ?? input.trim();
-    if (!messageToSend && !previewImage) return;
+const logConversation = async (userMsg, botMsg) => {
+  try {
+    await fetch("http://localhost:5050/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [
+          { sender: "user", text: userMsg },
+          { sender: "bot", text: botMsg }
+        ],
+        timestamp: new Date().toISOString()
+      })
+    });
+  } catch (err) {
+    console.error("Logging failed:", err);
+  }
+};
 
-    const lowered = messageToSend.toLowerCase();
+const handleSend = async (overrideText) => {
+  const messageToSend = overrideText ?? input.trim();
+  if (!messageToSend && !previewImage) return;
 
-    const yesResponses = [
-      "yes", "yeah", "yep", "yup", "yea", "ye", "y", "sure", "of course", "absolutely", "definitely", "ok", "okay"
-    ];
+  const lowered = messageToSend.toLowerCase();
 
-    // ✅ Handle appointment confirmation
-    if (
-      chatFlowStage === "awaiting_appointment_confirmation" &&
-      yesResponses.includes(lowered)
-    ) {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        {
-          sender: "bot",
-          isComponent: true,
-          component: (
-            <span>
-              Great! You can book your appointment here:{" "}
-              <a
-                href="https://forms.gle/k1kHBp6HDrHpre1aA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                Book Now
-              </a>
-            </span>
-          )
-        }
-      ]);
-      setChatFlowStage("start");
-      setInput("");
-      return;
-    }
+  const yesResponses = [
+    "yes", "yeah", "yep", "yup", "yea", "ye", "y", "sure", "of course", "absolutely", "definitely", "ok", "okay"
+  ];
 
-    // ✅ Trigger appointment flow only on booking keywords
-    if (
-      chatFlowStage === "start" &&
-      !appointmentPrompted &&
-      (lowered.includes("appointment") || lowered.includes("book"))
-    ) {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        { sender: "bot", text: "Sure! Would you like to set an appointment with us?" }
-      ]);
-      setAppointmentPrompted(true);
-      setChatFlowStage("awaiting_appointment_confirmation");
-      setUserMessageCount((count) => count + 1);
-      setInput("");
-      return;
-    }
+  if (chatFlowStage === "awaiting_appointment_confirmation" && yesResponses.includes(lowered)) {
+    const appointmentMessage = {
+      sender: "bot",
+      isComponent: true,
+      component: (
+        <span>
+          Great! You can book your appointment here:{" "}
+          <a
+            href="https://forms.gle/k1kHBp6HDrHpre1aA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            Book Now
+          </a>
+        </span>
+      )
+    };
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      appointmentMessage
+    ]);
+    await logConversation(messageToSend, "Great! You can book your appointment here: [link]");
+    setChatFlowStage("start");
+    setInput("");
+    return;
+  }
 
-    // Insurance logic
-    if (chatFlowStage === "choose_insurance_path") {
-      setMessages((prev) => [...prev, { sender: "user", text: messageToSend }]);
-      if (lowered === "full") {
-        setMessages((prev) => [...prev, { sender: "bot", text: "Great! Who is your insurance provider?" }]);
-        setChatFlowStage("awaiting_provider");
-      } else if (lowered === "estimate") {
-        setMessages((prev) => [...prev, {
-          sender: "bot",
-          text: "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
-        }]);
-        setChatFlowStage("estimate_only");
-      } else {
-        setMessages((prev) => [...prev, { sender: "bot", text: "Please type 'full' or 'estimate'." }]);
-      }
-      setInput("");
-      return;
-    }
+  if (
+    chatFlowStage === "start" &&
+    !appointmentPrompted &&
+    (lowered.includes("appointment") || lowered.includes("book"))
+  ) {
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      { sender: "bot", text: "Sure! Would you like to set an appointment with us?" }
+    ]);
+    await logConversation(messageToSend, "Sure! Would you like to set an appointment with us?");
+    setAppointmentPrompted(true);
+    setChatFlowStage("awaiting_appointment_confirmation");
+    setUserMessageCount((count) => count + 1);
+    setInput("");
+    return;
+  }
 
-    if (chatFlowStage === "offer_estimate" && lowered === "estimate") {
+  if (chatFlowStage === "choose_insurance_path") {
+    setMessages((prev) => [...prev, { sender: "user", text: messageToSend }]);
+    if (lowered === "full") {
+      setMessages((prev) => [...prev, { sender: "bot", text: "Great! Who is your insurance provider?" }]);
+      await logConversation(messageToSend, "Great! Who is your insurance provider?");
+      setChatFlowStage("awaiting_provider");
+    } else if (lowered === "estimate") {
       setMessages((prev) => [...prev, {
         sender: "bot",
         text: "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
       }]);
+      await logConversation(messageToSend, "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate.");
       setChatFlowStage("estimate_only");
-      setInput("");
-      return;
+    } else {
+      setMessages((prev) => [...prev, { sender: "bot", text: "Please type 'full' or 'estimate'." }]);
     }
-
-    if (chatFlowStage === "awaiting_provider") {
-      setInsuranceData((prev) => ({ ...prev, provider: messageToSend }));
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        { sender: "bot", text: "Got it! What's your member ID? (You can also skip this)" },
-      ]);
-      setChatFlowStage("awaiting_member_id");
-      setInput("");
-      return;
-    }
-
-    if (chatFlowStage === "awaiting_member_id") {
-      setInsuranceData((prev) => ({ ...prev, memberId: messageToSend }));
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        { sender: "bot", text: "Would you like to upload a photo of your insurance card for faster verification?\n(Upload it below or type 'skip')" },
-      ]);
-      setChatFlowStage("awaiting_card_upload");
-      setInput("");
-      return;
-    }
-
-    if (chatFlowStage === "awaiting_card_upload" && lowered === "skip") {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", text: messageToSend },
-        { sender: "bot", text: "No problem! Your insurance info has been noted." },
-      ]);
-      setChatFlowStage("offer_estimate");
-      setInput("");
-      return;
-    }
-
-    // Image upload logic
-    let finalImageUrl = null;
-    if (previewImage) {
-      const tempId = Date.now();
-      setMessages((prev) => [...prev, { id: tempId, sender: "user", isImage: true, text: previewImage.url }]);
-      const formData = new FormData();
-      formData.append("image", previewImage.file);
-
-      try {
-        const res = await fetch("https://dental-chatbot-backend.onrender.com/upload", {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        finalImageUrl = data.url;
-        setMessages((prev) =>
-          prev.map((msg) => msg.id === tempId ? { ...msg, text: finalImageUrl, isImage: true } : msg)
-        );
-        if (chatFlowStage === "awaiting_card_upload") {
-          setInsuranceData((prev) => ({ ...prev, image: finalImageUrl }));
-          setMessages((prev) => [...prev, { sender: "bot", text: "Thanks! Your insurance info is complete. Would you like a cost estimate now?" }]);
-          setChatFlowStage("offer_estimate");
-        }
-      } catch (err) {
-        console.error("Image upload failed:", err);
-      }
-      setPreviewImage(null);
-    }
-
-    // Default AI flow
-    if (messageToSend) {
-      setMessages((prev) => [...prev, { sender: "user", text: messageToSend }]);
-    }
-    setUserMessageCount((count) => count + 1);
     setInput("");
+    return;
+  }
+
+  if (chatFlowStage === "offer_estimate" && lowered === "estimate") {
+    setMessages((prev) => [...prev, {
+      sender: "bot",
+      text: "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
+    }]);
+    await logConversation(messageToSend, "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate.");
+    setChatFlowStage("estimate_only");
+    setInput("");
+    return;
+  }
+
+  if (chatFlowStage === "awaiting_provider") {
+    setInsuranceData((prev) => ({ ...prev, provider: messageToSend }));
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      { sender: "bot", text: "Got it! What's your member ID? (You can also skip this)" },
+    ]);
+    await logConversation(messageToSend, "Got it! What's your member ID? (You can also skip this)");
+    setChatFlowStage("awaiting_member_id");
+    setInput("");
+    return;
+  }
+
+  if (chatFlowStage === "awaiting_member_id") {
+    setInsuranceData((prev) => ({ ...prev, memberId: messageToSend }));
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      { sender: "bot", text: "Would you like to upload a photo of your insurance card for faster verification?\n(Upload it below or type 'skip')" },
+    ]);
+    await logConversation(messageToSend, "Would you like to upload a photo of your insurance card for faster verification? (Upload it below or type 'skip')");
+    setChatFlowStage("awaiting_card_upload");
+    setInput("");
+    return;
+  }
+
+  if (chatFlowStage === "awaiting_card_upload" && lowered === "skip") {
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: messageToSend },
+      { sender: "bot", text: "No problem! Your insurance info has been noted." },
+    ]);
+    await logConversation(messageToSend, "No problem! Your insurance info has been noted.");
+    setChatFlowStage("offer_estimate");
+    setInput("");
+    return;
+  }
+
+  let finalImageUrl = null;
+  if (previewImage) {
+    const tempId = Date.now();
+    setMessages((prev) => [...prev, { id: tempId, sender: "user", isImage: true, text: previewImage.url }]);
+    const formData = new FormData();
+    formData.append("image", previewImage.file);
 
     try {
-      const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
+      const res = await fetch("http://localhost:5050/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageToSend, imageUrl: finalImageUrl })
+        body: formData
       });
       const data = await res.json();
-      setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+      finalImageUrl = data.url;
+      setMessages((prev) =>
+        prev.map((msg) => msg.id === tempId ? { ...msg, text: finalImageUrl, isImage: true } : msg)
+      );
+      if (chatFlowStage === "awaiting_card_upload") {
+        setInsuranceData((prev) => ({ ...prev, image: finalImageUrl }));
+        setMessages((prev) => [...prev, { sender: "bot", text: "Thanks! Your insurance info is complete. Would you like a cost estimate now?" }]);
+        await logConversation("[image uploaded]", "Thanks! Your insurance info is complete. Would you like a cost estimate now?");
+        setChatFlowStage("offer_estimate");
+      }
     } catch (err) {
-      console.error("Error contacting AI server:", err);
+      console.error("Image upload failed:", err);
     }
-  };
+    setPreviewImage(null);
+  }
+
+  if (messageToSend) {
+    setMessages((prev) => [...prev, { sender: "user", text: messageToSend }]);
+  }
+  setUserMessageCount((count) => count + 1);
+  setInput("");
+
+  try {
+    const res = await fetch("http://localhost:5050/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: messageToSend, imageUrl: finalImageUrl })
+    });
+    const data = await res.json();
+    setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+    await logConversation(messageToSend, data.reply);
+  } catch (err) {
+    console.error("Error contacting AI server:", err);
+  }
+};
 
   const handleEstimate = () => {
     if (!selectedProcedure || !selectedInsuranceProvider) {
