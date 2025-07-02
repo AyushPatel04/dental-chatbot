@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dentalbot-backend
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PORT
+        value: 5050
+
+  - type: web
+    name: dentalbot-frontend
+    env: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: build

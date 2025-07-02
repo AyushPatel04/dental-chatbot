@@ -26,5 +26,271 @@
       }
     ],
     "timestamp": "2025-06-27T19:25:20.068Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "what is this"
+      },
+      {
+        "sender": "bot",
+        "text": "I'm sorry, I can't tell who this person is, but it appears to be a photo of someone holding an ID card."
+      }
+    ],
+    "timestamp": "2025-06-27T19:37:46.278Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Great! Who is your insurance provider?"
+      }
+    ],
+    "timestamp": "2025-06-27T19:48:56.526Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "idk"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! What's your member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-06-27T19:48:59.601Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "dk"
+      },
+      {
+        "sender": "bot",
+        "text": "Would you like to upload a photo of your insurance card for faster verification? (Upload it below or type 'skip')"
+      }
+    ],
+    "timestamp": "2025-06-27T19:49:00.280Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "skip"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Your insurance info has been noted."
+      }
+    ],
+    "timestamp": "2025-06-27T19:49:01.958Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "dk"
+      },
+      {
+        "sender": "bot",
+        "text": "Hello! How can I assist you today?"
+      }
+    ],
+    "timestamp": "2025-06-27T19:49:02.689Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "estimate"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
+      }
+    ],
+    "timestamp": "2025-06-27T20:10:54.894Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "EstiMATE"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
+      }
+    ],
+    "timestamp": "2025-06-27T20:17:34.485Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "book"
+      },
+      {
+        "sender": "bot",
+        "text": "Sure! Would you like to set an appointment with us?"
+      }
+    ],
+    "timestamp": "2025-06-28T11:02:59.935Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Great! You can book your appointment here: [link]"
+      }
+    ],
+    "timestamp": "2025-06-28T11:03:20.160Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "i have cavity"
+      },
+      {
+        "sender": "bot",
+        "text": "It's important to see a dentist as soon as possible to get the cavity filled. Ignoring it can lead to more serious dental issues in the future. Make an appointment with your dentist to address the cavity and maintain good oral hygiene to prevent further cavities."
+      }
+    ],
+    "timestamp": "2025-06-28T11:03:45.242Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "who do you work with"
+      },
+      {
+        "sender": "bot",
+        "text": "I work with a team of developers and engineers to help create and improve the AI technology that powers my responses. Additionally, I collaborate with content creators and trainers who help me learn and understand new information."
+      }
+    ],
+    "timestamp": "2025-06-28T11:03:55.144Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "what dentistary"
+      },
+      {
+        "sender": "bot",
+        "text": "Dentistry is the branch of medicine that focuses on the diagnosis, prevention, and treatment of conditions and diseases affecting the teeth, gums, and mouth. Dentists are healthcare professionals who specialize in providing oral care to patients of all ages, including performing cleanings, fillings, extractions, and other treatments to maintain or restore oral health. Dentistry also includes cosmetic procedures such as teeth whitening, veneers, and orthodontic treatments like braces or Invisalign. Regular dental check-ups are essential for maintaining good oral health and preventing dental problems from developing."
+      }
+    ],
+    "timestamp": "2025-06-28T11:04:04.908Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "whats the weather"
+      },
+      {
+        "sender": "bot",
+        "text": "I'm sorry, but I am an AI and do not have access to real-time weather information. You can check the weather on a weather website or app for the most up-to-date information."
+      }
+    ],
+    "timestamp": "2025-06-28T11:04:18.528Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "who won the nba finals"
+      },
+      {
+        "sender": "bot",
+        "text": "The Milwaukee Bucks won the NBA Finals in 2021, defeating the Phoenix Suns in six games."
+      }
+    ],
+    "timestamp": "2025-06-28T11:04:31.489Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "estimate"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Please select a procedure and your insurance from the dropdowns below to get a cost estimate."
+      }
+    ],
+    "timestamp": "2025-06-28T11:05:01.552Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "thanks"
+      },
+      {
+        "sender": "bot",
+        "text": "You're welcome! Let me know if there's anything else I can help with."
+      }
+    ],
+    "timestamp": "2025-06-28T11:05:21.955Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": [""]
+      },
+      {
+        "sender": "bot",
+        "text": "The image shows a logo for \"InfynIQ Solutions.\" It features a design resembling a brain with circuit lines, suggesting a theme related to technology or artificial intelligence. The color scheme is black and white."
+      }
+    ],
+    "timestamp": "2025-06-28T11:06:06.005Z"
+  },
+  {
+    "type": "conversation",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "do yk the company"
+      },
+      {
+        "sender": "bot",
+        "text": "Unfortunately, I will need more information to determine which company you are referring to. Please provide more context or details so I can help you further."
+      }
+    ],
+    "timestamp": "2025-06-28T11:06:16.655Z"
   }
 ]
