@@ -25,7 +25,7 @@ const [messages, setMessages] = useState([
 
 const logConversation = async (userMsg, botMsg) => {
   try {
-    await fetch("http://localhost:5050/log", {
+    await fetch("https://dental-chatbot-backend.onrender.com/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -175,7 +175,7 @@ const handleSend = async (overrideText) => {
     formData.append("image", previewImage.file);
 
     try {
-      const res = await fetch("http://localhost:5050/upload", {
+      const res = await fetch("https://dental-chatbot-backend.onrender.com/upload", {
         method: "POST",
         body: formData
       });
@@ -203,7 +203,7 @@ const handleSend = async (overrideText) => {
   setInput("");
 
   try {
-    const res = await fetch("http://localhost:5050/chat", {
+    const res = await fetch("https://dental-chatbot-backend.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: messageToSend, imageUrl: finalImageUrl })
