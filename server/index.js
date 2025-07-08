@@ -157,3 +157,4 @@ app.post("/book-appointment", (req, res) => {
 
 const PORT = 5050;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+

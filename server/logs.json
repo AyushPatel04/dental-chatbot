@@ -502,5 +502,889 @@
       }
     ],
     "timestamp": "2025-07-08T20:43:59.054Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "BrightSmile Basic"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T20:47:07.775Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T20:50:07.176Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:50:09.451Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T20:50:11.628Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T20:55:56.773Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:55:58.400Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T20:55:59.681Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:02:02.141Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:02:03.691Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:02:04.465Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:03:14.416Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:03:15.844Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:03:16.541Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:05:56.770Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:05:58.396Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:05:59.068Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:10:39.766Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: BrightSmile Basic. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:10:43.166Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "BrightSmile Basic"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:10:44.123Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "s"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **BrightSmile Basic** plan, here is your itemized estimate:\n\n- Filling (2 Surfaces): **$110**\n- Fluoride Treatment: **$20**\n- Deep Cleaning: **$90**\n- Routine Cleaning: **$25**\n- Teeth Whitening (In-Office): **$300**\n\n**Total Estimated Cost: $545.00**"
+      }
+    ],
+    "timestamp": "2025-07-08T21:10:50.238Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "s"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'."
+      }
+    ],
+    "timestamp": "2025-07-08T21:10:53.941Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "s"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Please select a procedure and your insurance from the dropdowns below to get a quick cost estimate."
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:00.154Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "estimate"
+      },
+      {
+        "sender": "bot",
+        "text": "The estimated cost for Implant (Single Tooth) with ToothCare Plus is **$2,000**."
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:03.836Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Estimate for Implant (Single Tooth) with ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'."
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:06.124Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Estimate for Implant (Single Tooth) with ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. Would you like to upload a photo of your insurance card or enter the details manually?"
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:07.746Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:09.206Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:10.766Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:11:11.451Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:14:18.917Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:14:20.568Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:14:21.263Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:19:35.532Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:19:37.126Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:19:37.675Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:23:25.408Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:23:27.018Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:23:27.598Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:27:47.705Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:27:49.371Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:27:50.595Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:28:55.248Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:28:56.743Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:28:57.584Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:29:39.870Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: BrightSmile Basic. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:29:41.435Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "BrightSmile Basic"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:29:42.378Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:34:22.501Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:34:23.977Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:34:24.609Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **ToothCare Plus** plan, here is your itemized estimate:\n\n- Fluoride Treatment: **$10**\n- Dental Bridge: **$1,200**\n\n**Total Estimated Cost: $1210.00**"
+      }
+    ],
+    "timestamp": "2025-07-08T21:39:54.990Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\\nType 'full' or 'estimate'."
+      }
+    ],
+    "timestamp": "2025-07-08T21:40:05.025Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:40:15.126Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: HappyMouth Gold. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:40:16.466Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "HappyMouth Gold"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:40:17.033Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **HappyMouth Gold** plan, here is your itemized estimate:\n\n- Fluoride Treatment: **$0**\n\n**Total Estimated Cost: $0.00**"
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:30.324Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\\nType 'full' or 'estimate'."
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:31.875Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. Would you like to upload a photo of your insurance card or enter the details manually?"
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:34.057Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:34.993Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:36.544Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:48:37.097Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T21:59:44.382Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T21:59:45.638Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T21:59:46.544Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "s"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **ToothCare Plus** plan, here is your itemized estimate:\n\n- Routine Cleaning: **$0**\n- Filling (2 Surfaces): **$90**\n- Tooth Extraction (Simple): **$60**\n\n**Total Estimated Cost: $150.00**"
+      }
+    ],
+    "timestamp": "2025-07-08T22:04:28.463Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T22:04:33.957Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: ToothCare Plus. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T22:04:35.317Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ToothCare Plus"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-08T22:04:36.030Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "e"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **ToothCare Plus** plan, here is your itemized estimate:\n\n- Routine Cleaning: **$0**\n- Oral Cancer Screening: **$20**\n- Filling (1 Surface): **$70**\n- Tooth Extraction (Simple): **$60**\n- Crown (Metal): **$450**\n\n**Total Estimated Cost: $600.00**"
+      }
+    ],
+    "timestamp": "2025-07-08T22:04:43.324Z"
   }
 ]

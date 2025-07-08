@@ -17,33 +17,70 @@ const InsuranceProviderSelector = ({ onSelectProvider }) => {
     if (otherValue.trim()) onSelectProvider(otherValue.trim(), true);
   };
   return (
-    <div className="p-2 space-y-2 bg-gray-100 rounded-lg">
-      <select onChange={handleSelectChange} value={selection} className="w-full p-2 border rounded-md">
+    <div className="p-4 space-y-3 bg-gray-100 rounded-lg">
+      <select onChange={handleSelectChange} value={selection} className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-indigo-500">
         <option value="">-- Select Your Provider --</option>
         {providers.map((p) => <option key={p} value={p}>{p}</option>)}
       </select>
       {selection === "Other" && (
-        <div className="space-y-2">
-          <input type="text" placeholder="Please type your provider name" value={otherValue} onChange={(e) => setOtherValue(e.target.value)} className="w-full p-2 border rounded-md" />
-          <button onClick={handleContinue} className="w-full bg-blue-500 text-white p-2 rounded-lg font-bold">Continue</button>
+        <div className="space-y-3">
+          <input type="text" placeholder="Please type your provider name" value={otherValue} onChange={(e) => setOtherValue(e.target.value)} className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500" />
+          <button onClick={handleContinue} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg font-bold text-base transition-colors duration-200">Continue</button>
         </div>
       )}
     </div>
   );
 };
-const ProcedureSelector = ({ selected, onToggle }) => (
-  <div className="p-3 bg-gray-100 rounded-lg max-h-48 overflow-y-auto">
-    <p className="font-bold mb-2">Select procedures:</p>
-    <div className="space-y-2">
-      {Object.keys(procedureCosts).map((proc) => (
-        <label key={proc} className="flex items-center space-x-2 cursor-pointer">
-          <input type="checkbox" checked={selected.includes(proc)} onChange={() => onToggle(proc)} className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-          <span>{proc}</span>
-        </label>
-      ))}
+
+const ProcedureSelector = ({ selected, onToggle, onCalculate }) => {
+  // Group related procedures to display them on the same row
+  const procedureGroups = [
+    ['Routine Cleaning', 'Deep Cleaning'],
+    ['Dental Exam', 'X-Ray (Bitewing)'],
+    ['Fluoride Treatment', 'Oral Cancer Screening'],
+    ['Filling (1 Surface)', 'Filling (2 Surfaces)'],
+    ['Tooth Extraction (Simple)', 'Tooth Extraction (Surgical)'],
+    ['Crown (Porcelain)', 'Crown (Metal)'],
+    ['Root Canal (Front Tooth)', 'Root Canal (Molar)'],
+    ['Dental Bridge', 'Implant (Single Tooth)'],
+    ['Teeth Whitening (In-Office)', 'Sealant (Per Tooth)'],
+    ['Mouth Guard (Night)'],
+    ['Denture (Full Upper or Lower)'],
+  ];
+
+  return (
+    <div className="procedure-overlay">
+      <div className="procedure-modal">
+        <p className="procedure-modal-title">Select Procedures</p>
+        <div className="procedure-list">
+          {procedureGroups.map((group, index) => (
+            <div key={index} className="procedure-group">
+              {group.map((proc) => {
+                const isSelected = selected.includes(proc);
+                return (
+                  <button
+                    key={proc}
+                    onClick={() => onToggle(proc)}
+                    className={`procedure-button ${isSelected ? 'selected' : ''}`}
+                  >
+                    {proc}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="calculate-button-container">
+          <button onClick={onCalculate} className="calculate-button">
+            Calculate Full Estimate
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+
 const QuickEstimateSelector = ({ onEstimate }) => {
   const [procedure, setProcedure] = useState("");
   const [insurance, setInsurance] = useState("");
@@ -52,23 +89,23 @@ const QuickEstimateSelector = ({ onEstimate }) => {
     else alert("Please select both a procedure and an insurance provider.");
   };
   return (
-    <div className="p-2 space-y-2 bg-gray-100">
-      <select value={procedure} onChange={e => setProcedure(e.target.value)} className="w-full p-2 border rounded-md">
+    <div className="p-4 space-y-3 bg-gray-100 rounded-lg">
+      <select value={procedure} onChange={e => setProcedure(e.target.value)} className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-indigo-500">
         <option value="">Select Procedure</option>
         {Object.keys(procedureCosts).map(p => <option key={p} value={p}>{p}</option>)}
       </select>
-      <select value={insurance} onChange={e => setInsurance(e.target.value)} disabled={!procedure} className="w-full p-2 border rounded-md">
+      <select value={insurance} onChange={e => setInsurance(e.target.value)} disabled={!procedure} className="w-full p-3 border border-gray-300 rounded-md text-base focus:ring-2 focus:ring-indigo-500">
         <option value="">Select Insurance</option>
         {procedure && Object.keys(procedureCosts[procedure]).map(ins => <option key={ins} value={ins}>{ins}</option>)}
       </select>
-      <button className="w-full bg-green-600 text-white p-2 rounded-lg font-bold" onClick={handleGetEstimate}>Get Quick Estimate</button>
+      <button className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-bold text-base transition-colors duration-200" onClick={handleGetEstimate}>Get Quick Estimate</button>
     </div>
   );
 };
 const ConfirmationButtons = ({ onConfirm, onDeny }) => (
-  <div className="flex justify-center gap-2 p-2">
-    <button onClick={onConfirm} className="flex-1 bg-green-500 text-white p-2 rounded-lg font-bold">👍 Yes, Correct</button>
-    <button onClick={onDeny} className="flex-1 bg-red-500 text-white p-2 rounded-lg font-bold">👎 No, Incorrect</button>
+  <div className="flex justify-center gap-3 p-3">
+    <button onClick={onConfirm} className="flex-1 bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-bold text-base transition-colors duration-200">👍 Yes, Correct</button>
+    <button onClick={onDeny} className="flex-1 bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg font-bold text-base transition-colors duration-200">👎 No, Incorrect</button>
   </div>
 );
 
@@ -396,7 +433,20 @@ export default function Chatbot() {
   }, [messages]);
   
   const renderChatStageUI = () => {
-    // During key conversational flows, we only need the text input.
+    if (chatFlowStage === 'selecting_multiple_procedures') {
+        return (
+            <ProcedureSelector 
+                selected={selectedProcedures} 
+                onToggle={(proc) => setSelectedProcedures(prev => 
+                    prev.includes(proc) 
+                        ? prev.filter(p => p !== proc) 
+                        : [...prev, proc]
+                )} 
+                onCalculate={handleFullEstimate}
+            />
+        );
+    }
+    
     const showOnlyTextInput = chatFlowStage.startsWith('booking_') || 
                               ['awaiting_prereg_decision', 'awaiting_booking_method'].includes(chatFlowStage);
     
@@ -424,13 +474,6 @@ export default function Chatbot() {
           addMessage("bot", `Got it: ${provider}. Now, what is your Member ID? (You can also skip this)`);
           setChatFlowStage("awaiting_manual_member_id");
         }} />;
-      case 'selecting_multiple_procedures':
-        return (
-          <div className="p-2 space-y-2">
-            <ProcedureSelector selected={selectedProcedures} onToggle={(proc) => setSelectedProcedures(prev => prev.includes(proc) ? prev.filter(p => p !== proc) : [...prev, proc])} />
-            <button onClick={handleFullEstimate} className="w-full bg-green-600 text-white p-2 rounded-lg font-bold">Calculate Full Estimate</button>
-          </div>
-        );
       case 'estimate_only':
         return <QuickEstimateSelector onEstimate={handleQuickEstimate} />;
       case 'confirming_photo_details':
@@ -474,7 +517,7 @@ export default function Chatbot() {
             { chatFlowStage === 'start' && (
               <div className="insurance-button-wrapper">
                 <button className="insurance-start-btn" onClick={() => {
-                  addMessage("bot", "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'.");
+                  addMessage("bot", "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\nType 'full' or 'estimate'.");
                   setChatFlowStage("choose_insurance_path");
                 }}>🩺 Get Insurance Estimate</button>
               </div>
