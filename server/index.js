@@ -64,11 +64,9 @@ app.post("/extract-info", upload.single("image"), async (req, res) => {
   }
 });
 
-// Updated /chat endpoint with guardrails
 app.post("/chat", async (req, res) => {
   const { message, imageUrl } = req.body;
   
-  // If there's an image, it's almost certainly dental-related, so we bypass the topic check.
   if (imageUrl) {
     try {
       const imagePath = path.resolve(__dirname, "uploads", path.basename(imageUrl));
@@ -93,9 +91,7 @@ app.post("/chat", async (req, res) => {
     }
   }
 
-  // --- THIS IS THE NEW GUARDRAIL LOGIC for text-only messages ---
   try {
-    // Step 1: Classify the user's message
     const topicCheck = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [{
@@ -111,12 +107,10 @@ app.post("/chat", async (req, res) => {
 
     const isTopicRelevant = topicCheck.choices[0].message.content.toLowerCase().includes('yes');
 
-    // Step 2: If not relevant, send a predefined response.
     if (!isTopicRelevant) {
         return res.json({ reply: "I'm sorry, I can only answer questions related to dentistry." });
     }
 
-    // Step 3: If relevant, proceed with the normal chat response.
     const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: message }]
@@ -139,6 +133,24 @@ app.post("/log", (req, res) => {
     fs.writeFile(LOG_FILE, JSON.stringify(logs, null, 2), (writeErr) => {
       if (writeErr) return res.status(500).send("Failed to log");
       res.send("Logged");
+    });
+  });
+});
+
+app.post("/book-appointment", (req, res) => {
+  const appointmentData = { ...req.body, submissionTimestamp: new Date().toISOString() };
+  console.log("New Appointment Booking Request:", JSON.stringify(appointmentData, null, 2));
+
+  const APPOINTMENT_LOG_FILE = path.join(__dirname, "appointments.json");
+  fs.readFile(APPOINTMENT_LOG_FILE, "utf8", (err, data) => {
+    const appointments = err ? [] : JSON.parse(data || "[]");
+    appointments.push(appointmentData);
+    fs.writeFile(APPOINTMENT_LOG_FILE, JSON.stringify(appointments, null, 2), (writeErr) => {
+      if (writeErr) {
+        console.error("Failed to log appointment:", writeErr);
+        return res.status(500).send("Failed to save appointment");
+      }
+      res.status(200).json({ message: "Appointment booked successfully and logged." });
     });
   });
 });

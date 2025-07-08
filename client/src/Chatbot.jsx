@@ -83,8 +83,12 @@ export default function Chatbot() {
   const [chatFlowStage, setChatFlowStage] = useState("start");
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", isOther: false });
   const [selectedProcedures, setSelectedProcedures] = useState([]);
-  const [appointmentPrompted, setAppointmentPrompted] = useState(false);
   const [uploadContext, setUploadContext] = useState('general');
+  
+  const [appointmentData, setAppointmentData] = useState({
+    fullName: "", email: "", bookingDay: "", timeSlot: "",
+    reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+  });
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -107,6 +111,28 @@ export default function Chatbot() {
       if(lastUserMessage) logConversation(lastUserMessage.text, text);
     }
   };
+  
+  const submitAppointment = async (finalData) => {
+    addMessage("bot", "Thank you! Submitting your appointment request...");
+    try {
+        const res = await fetch("http://localhost:5050/book-appointment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(finalData),
+        });
+        if (!res.ok) throw new Error("Submission failed on the server.");
+        
+        addMessage("bot", "Your appointment request has been received! We will contact you shortly to confirm the details.");
+    } catch (err) {
+        console.error("Appointment submission failed:", err);
+    } finally {
+        setChatFlowStage("start");
+        setAppointmentData({
+            fullName: "", email: "", bookingDay: "", timeSlot: "",
+            reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+        });
+    }
+  };
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -117,7 +143,6 @@ export default function Chatbot() {
     formData.append("image", file);
     
     try {
-      // Step 1: Always upload the file first to get a URL
       const uploadRes = await fetch("http://localhost:5050/upload", { method: "POST", body: formData });
       if (!uploadRes.ok) throw new Error('File upload failed');
       const { url: imageUrl } = await uploadRes.json();
@@ -125,9 +150,7 @@ export default function Chatbot() {
       
       setMessages(prev => prev.map(m => m.text.startsWith("Uploading") ? { ...m, text: imageUrl, isImage: true } : m));
 
-      // Step 2: Decide what to do with the image based on context
       if (uploadContext === 'insurance') {
-        // We need to re-send the file data for extraction, not just the URL
         const extractFormData = new FormData();
         extractFormData.append("image", file);
         const extractRes = await fetch("http://localhost:5050/extract-info", { method: "POST", body: extractFormData });
@@ -206,20 +229,118 @@ export default function Chatbot() {
     addMessage("user", userMessage);
     setInput("");
     const lowered = userMessage.toLowerCase();
-    const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right"];
+    const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
+    
+    // --- MODIFIED: Booking & Pre-registration Flow ---
     if (chatFlowStage === "start" && (lowered.includes("appointment") || lowered.includes("book"))) {
-      addMessage("bot", "Sure! Would you like to set an appointment with us?");
-      setAppointmentPrompted(true);
-      setChatFlowStage("awaiting_appointment_confirmation");
-      return;
+        addMessage("bot", "To save time during your visit, would you like to fill out some pre-registration forms now? (yes/no)");
+        setChatFlowStage("awaiting_prereg_decision");
+        return;
     }
-    if (chatFlowStage === "awaiting_appointment_confirmation" && affirmativeResponses.includes(lowered)) {
-      const appointmentMessage = `Great! You can book your appointment here: <a href="https://forms.gle/k1kHBp6HDrHpre1aA" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Book Now</a>`;
-      addMessage("bot", appointmentMessage);
-      setChatFlowStage("start");
-      setAppointmentPrompted(false);
-      return;
+
+    if (chatFlowStage === "awaiting_prereg_decision") {
+        const bookingMessage = `To book your appointment, you can use our secure online portal here: <a href="https://forms.gle/k1kHBp6HDrHpre1aA" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Book Online</a>. \n\nIf you'd prefer, I can assist you with booking right here. Just say "assist me".`;
+
+        if (affirmativeResponses.includes(lowered)) {
+            addMessage("bot", `Great! You can complete your pre-registration forms here to save time: <a href="/fake-prereg-form" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Pre-Registration Form</a>.`);
+            addMessage("bot", `Once that's done, let's get you booked. ${bookingMessage}`);
+        } else {
+            addMessage("bot", `No problem. ${bookingMessage}`);
+        }
+        setChatFlowStage("awaiting_booking_method");
+        return;
     }
+
+    if (chatFlowStage === "awaiting_booking_method") {
+        if (lowered.includes("assist") || lowered.includes("help")) {
+            addMessage("bot", "Of course. I can help you book an appointment. First, what is your full name?");
+            setChatFlowStage("booking_start");
+        } else {
+             addMessage("bot", "No problem, you can use the link when you're ready or let me know if you need anything else!");
+             setChatFlowStage("start");
+        }
+        return;
+    }
+
+    if (chatFlowStage.startsWith('booking_')) {
+      switch (chatFlowStage) {
+        case 'booking_start':
+            setAppointmentData(prev => ({ ...prev, fullName: userMessage }));
+            addMessage("bot", "Thanks! What is your email address?");
+            setChatFlowStage('booking_ask_email');
+            break;
+        case 'booking_ask_email':
+            if (!/^\S+@\S+\.\S+$/.test(userMessage)) {
+                addMessage("bot", "That doesn't look like a valid email. Could you please enter a valid email address?");
+                break;
+            }
+            setAppointmentData(prev => ({ ...prev, email: userMessage }));
+            addMessage("bot", "Great. What day would you like to book? (e.g., MM/DD/YYYY or 'next Tuesday')");
+            setChatFlowStage('booking_ask_day');
+            break;
+        case 'booking_ask_day':
+            setAppointmentData(prev => ({ ...prev, bookingDay: userMessage }));
+            addMessage("bot", "And what time would be preferred? (e.g., 'morning', 'afternoon', or a specific time)");
+            setChatFlowStage('booking_ask_time');
+            break;
+        case 'booking_ask_time':
+            setAppointmentData(prev => ({ ...prev, timeSlot: userMessage }));
+            addMessage("bot", "What is the primary reason for your visit?");
+            setChatFlowStage('booking_ask_reason');
+            break;
+        case 'booking_ask_reason':
+            setAppointmentData(prev => ({ ...prev, reason: userMessage }));
+            addMessage("bot", "Do you have dental insurance? (yes/no)");
+            setChatFlowStage('booking_ask_has_insurance');
+            break;
+        case 'booking_ask_has_insurance':
+            if (affirmativeResponses.includes(lowered)) {
+                setAppointmentData(prev => ({ ...prev, hasInsurance: true }));
+                addMessage("bot", "Okay. Who is your insurance provider?");
+                setChatFlowStage('booking_ask_insurance_provider');
+            } else {
+                setAppointmentData(prev => ({ ...prev, hasInsurance: false, insuranceProvider: "N/A" }));
+                addMessage("bot", "Understood. Is there anything else you'd like us to know? (Type 'skip' if not)");
+                setChatFlowStage('booking_ask_notes');
+            }
+            break;
+        case 'booking_ask_insurance_provider':
+            setAppointmentData(prev => ({ ...prev, insuranceProvider: userMessage }));
+            addMessage("bot", "Got it. Lastly, is there anything else you'd like us to know? (Type 'skip' if not)");
+            setChatFlowStage('booking_ask_notes');
+            break;
+        case 'booking_ask_notes':
+            const finalData = { ...appointmentData, notes: userMessage === 'skip' ? 'N/A' : userMessage };
+            setAppointmentData(finalData);
+            
+            const summary = `Please confirm your details:\n` +
+                `- **Name:** ${finalData.fullName}\n` +
+                `- **Email:** ${finalData.email}\n` +
+                `- **Date:** ${finalData.bookingDay}\n` +
+                `- **Time:** ${finalData.timeSlot}\n` +
+                `- **Reason:** ${finalData.reason}\n` +
+                `- **Insurance:** ${finalData.hasInsurance ? `Yes (${finalData.insuranceProvider})` : 'No'}\n` +
+                `- **Notes:** ${finalData.notes}\n\n` +
+                `Is this all correct? (yes/no)`;
+            addMessage("bot", summary);
+            setChatFlowStage('booking_confirm');
+            break;
+        case 'booking_confirm':
+            if (affirmativeResponses.includes(lowered)) {
+                submitAppointment(appointmentData);
+            } else {
+                addMessage("bot", "I'm sorry about that. Let's start over to make sure we get it right. What is your full name?");
+                setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: "" });
+                setChatFlowStage('booking_start');
+            }
+            break;
+        default:
+            setChatFlowStage("start");
+            break;
+      }
+      return; 
+    }
+
     if (chatFlowStage === "choose_insurance_path") {
       if (lowered === 'full') {
         addMessage("bot", "Great. Would you like to upload a photo of your insurance card or enter the details manually?");
@@ -275,6 +396,19 @@ export default function Chatbot() {
   }, [messages]);
   
   const renderChatStageUI = () => {
+    // During key conversational flows, we only need the text input.
+    const showOnlyTextInput = chatFlowStage.startsWith('booking_') || 
+                              ['awaiting_prereg_decision', 'awaiting_booking_method'].includes(chatFlowStage);
+    
+    if (showOnlyTextInput) {
+        return (
+            <div className="chat-input-row">
+                <input className="chat-input" type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Your answer..." onKeyDown={(e) => e.key === "Enter" && handleSend()} />
+                <button className="send-btn" onClick={() => handleSend()}>Send</button>
+            </div>
+        );
+    }
+
     switch(chatFlowStage) {
       case 'awaiting_upload_or_manual':
         return (
@@ -337,12 +471,14 @@ export default function Chatbot() {
               <div ref={messagesEndRef} />
             </div>
             <input type="file" accept="image/*" id="fileUpload" style={{ display: "none" }} onChange={handleFileSelect} ref={fileInputRef} />
-            <div className="insurance-button-wrapper">
-              <button className="insurance-start-btn" onClick={() => {
-                addMessage("bot", "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'.");
-                setChatFlowStage("choose_insurance_path");
-              }}>🩺 Get Insurance Estimate</button>
-            </div>
+            { chatFlowStage === 'start' && (
+              <div className="insurance-button-wrapper">
+                <button className="insurance-start-btn" onClick={() => {
+                  addMessage("bot", "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'.");
+                  setChatFlowStage("choose_insurance_path");
+                }}>🩺 Get Insurance Estimate</button>
+              </div>
+            )}
             {renderChatStageUI()}
           </div>
         </div>

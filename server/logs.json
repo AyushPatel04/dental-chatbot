@@ -270,7 +270,9 @@
     "messages": [
       {
         "sender": "user",
-        "text": [""]
+        "text": [
+          ""
+        ]
       },
       {
         "sender": "bot",
@@ -292,5 +294,213 @@
       }
     ],
     "timestamp": "2025-06-28T11:06:16.655Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "bok"
+      },
+      {
+        "sender": "bot",
+        "text": "To save time during your visit, would you like to fill out some pre-registration forms now? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:07.905Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "book"
+      },
+      {
+        "sender": "bot",
+        "text": "Once that's done, let's get you booked. To book your appointment, you can use our secure online portal here: <a href=\"https://forms.gle/k1kHBp6HDrHpre1aA\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">Book Online</a>. \n\nIf you'd prefer, I can assist you with booking right here. Just say \"assist me\"."
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:10.794Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Of course. I can help you book an appointment. First, what is your full name?"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:15.972Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "assist me"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! What is your email address?"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:20.676Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ayush"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. What day would you like to book? (e.g., MM/DD/YYYY or 'next Tuesday')"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:30.803Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "a@gmail.com"
+      },
+      {
+        "sender": "bot",
+        "text": "And what time would be preferred? (e.g., 'morning', 'afternoon', or a specific time)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:33.145Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "tuesday"
+      },
+      {
+        "sender": "bot",
+        "text": "What is the primary reason for your visit?"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:35.284Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "morning"
+      },
+      {
+        "sender": "bot",
+        "text": "Do you have dental insurance? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:42.535Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "d"
+      },
+      {
+        "sender": "bot",
+        "text": "Okay. Who is your insurance provider?"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:44.048Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it. Lastly, is there anything else you'd like us to know? (Type 'skip' if not)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:45.467Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "s"
+      },
+      {
+        "sender": "bot",
+        "text": "Please confirm your details:\n- **Name:** ayush\n- **Email:** a@gmail.com\n- **Date:** tuesday\n- **Time:** morning\n- **Reason:** d\n- **Insurance:** Yes (s)\n- **Notes:** N/A\n\nIs this all correct? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:47.547Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "skip"
+      },
+      {
+        "sender": "bot",
+        "text": "Thank you! Submitting your appointment request..."
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:49.756Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\n\nType 'full' or 'estimate'."
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:52.158Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. Would you like to upload a photo of your insurance card or enter the details manually?"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:54.353Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Please select your insurance provider from the list below."
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:55.450Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Enter Manually"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it: BrightSmile Basic. Now, what is your Member ID? (You can also skip this)"
+      }
+    ],
+    "timestamp": "2025-07-08T20:43:59.054Z"
   }
 ]
