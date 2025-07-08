@@ -1,3 +1,4 @@
+/* Default App.css styles (preserved) */
 .App {
   text-align: center;
   position: relative;
@@ -38,7 +39,7 @@
   }
 }
 
-/* === Chatbot Styling === */
+/* === Chatbot Styling (Updated with KCU Theme) === */
 
 .chatbot-container {
   position: fixed;
@@ -46,13 +47,15 @@
   right: 20px;
   width: 360px;
   height: 500px;
-  background-color: #f5f5f5;
+  /* Use a light grey from the KCU website for the main container */
+  background-color: #e8e6e7;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   z-index: 1000;
   transition: width 0.2s, height 0.2s;
+  overflow: hidden; /* Ensures child elements adhere to border radius */
 }
 
 .chatbot-container.maximized {
@@ -70,7 +73,8 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #006064;
+  /* KCU Purple */
+  background-color: #4b2e4c;
   color: white;
   border: none;
   border-radius: 50%;
@@ -80,6 +84,9 @@
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chatbot-ui {
@@ -87,58 +94,109 @@
   flex-direction: column;
   height: 100%;
   font-family: sans-serif;
-  color: #00363a;
+  color: #333;
   position: relative;
 }
 
-/* Header with left and center icons */
-.chatbot-header {
-  width: 100%;
-  min-height: 46px;
+/* KCU-themed top header */
+.chatbot-top-header {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  pointer-events: none;
+  justify-content: space-between;
+  align-items: center;
+  /* KCU Purple */
+  background-color: #4b2e4c;
+  padding: 10px 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  color: white;
+  flex-shrink: 0; /* Prevents header from shrinking */
 }
 
-/* Top left expand/minimize button */
+.header-left,
+.header-right {
+  flex: 1;
+  pointer-events: auto;
+}
+
+.header-center {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.header-left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .expand-btn {
-  margin-top: 0px;
-  margin-left: -5px;
-  background: transparent;        /* No color/box */
+  background: transparent;
   border: none;
   border-radius: 8px;
   padding: 3px 6px;
   cursor: pointer;
-  pointer-events: auto;
   transition: background 0.2s;
-  z-index: 12;
-  box-shadow: none;              /* Remove box shadow */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .expand-btn:hover {
-  background: #b2dfdb33;        /* very light hover, or use transparent */
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Give more space below header for the title */
-h2 {
-  margin-top: 56px !important;   /* More space so title is not overlapped */
-  margin-bottom: 12px;
+.minimize-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
 }
+
+.minimize-btn:hover {
+  opacity: 0.8;
+}
+
+.bot-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+.bot-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.bot-name {
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+
+.bot-status {
+  color: #d4f9e5;
+  font-size: 11px;
+}
+
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding-right: 6px;
-  padding-left: 6px;
-  margin-bottom: 8px;
+  padding: 8px;
+  /* Match the main container background */
+  background-color: #e8e6e7;
 }
 
 .chat-input-row {
@@ -149,19 +207,25 @@ h2 {
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
+  flex-shrink: 0; /* Prevents input row from shrinking */
 }
 
 .chat-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #004d40;
+  border: 1px solid #ccc;
   border-radius: 9999px;
   font-size: 14px;
   outline: none;
 }
 
+.chat-input:focus {
+  border-color: #4b2e4c; /* KCU Purple on focus */
+}
+
 .send-btn {
-  background-color: #00796b;
+  /* KCU Purple */
+  background-color: #4b2e4c;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -170,6 +234,11 @@ h2 {
   cursor: pointer;
   font-size: 14px;
 }
+
+.send-btn:hover {
+  background-color: #3a223b; /* Darker Purple */
+}
+
 
 /* Paperclip upload button */
 .upload-btn {
@@ -181,17 +250,19 @@ h2 {
   align-items: center;
   justify-content: center;
   transition: box-shadow 0.2s;
+  color: #555;
 }
 
 .upload-btn:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  color: #000;
+  background-color: #e0e0e0;
 }
 
 /* Message alignment */
 .message-row {
   display: flex;
   align-items: flex-end;
-  margin: 4px 8px;
+  margin: 8px 4px;
 }
 
 .align-left {
@@ -210,17 +281,19 @@ h2 {
   word-wrap: break-word;
   font-size: 14px;
   line-height: 1.4;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .chat-message.bot {
-  background-color: #f0fdfa;
-  color: #004d4d;
+  /* White bubble for bot, as seen on many sites */
+  background-color: #ffffff;
+  color: #333;
   border-bottom-left-radius: 4px;
 }
 
 .chat-message.user {
-  background-color: #00695c;
+  /* KCU Purple for user messages */
+  background-color: #4b2e4c;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -229,11 +302,10 @@ h2 {
 .message-avatar {
   width: 32px;
   height: 32px;
-  margin-right: 6px;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-right: 8px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 /* Animation */
@@ -252,149 +324,12 @@ h2 {
   }
 }
 
-/* Custom LeadBot-style top header */
-.chatbot-top-header {
-  height: 36px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #00796b; /* Match send button */
-  padding: 10px 16px;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  color: white;
-}
-
-.header-left,
-.header-center,
-.header-right {
-  pointer-events: auto;
-}
-
-.header-left {
-  flex: 1;
-}
-
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.header-right {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.minimize-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.minimize-btn:hover {
-  opacity: 0.8;
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0px;
-  flex: 2;
-}
-
-.bot-avatar {
-  width: 55px;
-  height: 55px;
-}
-
-.bot-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* ✅ centers child text elements */
-  justify-content: center;
-  line-height: 1.2;
-}
-
-.bot-name {
-  font-weight: bold;
-  color: white;
-  font-size: 14px;
-}
-
-.bot-status {
-  color: #d4f9e5;
-  font-size: 11px;
-}
-
-.message-avatar {
-  width: 24px;
-  height: 24px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background-color: #00796b; /* Same green as header/send button */
-  padding: 4px;
-  object-fit: contain;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.preview-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.75rem 1rem;
-}
-
-.preview-image-container {
-  position: relative;
-  max-width: 180px;
-  max-height: 180px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.preview-thumb-large {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-  object-fit: cover;
-}
-
-.preview-close {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(255, 255, 255, 0.85);
-  border: none;
-  border-radius: 50%;
-  font-size: 14px;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  font-weight: bold;
-  color: #333;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.preview-close:hover {
-  background: rgba(255, 255, 255, 1);
-}
-
+/* Image Preview Styling */
 .preview-image-wrapper {
   display: flex;
-  padding: 4px 8px 0 8px;
+  padding: 4px 8px 8px 8px;
   background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
 }
 
 .preview-image-box {
@@ -402,23 +337,24 @@ h2 {
   display: inline-block;
   border-radius: 10px;
   overflow: hidden;
-  max-width: 120px;
-  max-height: 120px;
+  max-width: 100px;
+  max-height: 100px;
   border: 1px solid #ccc;
 }
 
 .preview-img-small {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  border-radius: 10px;
+  object-fit: cover;
 }
 
 .preview-remove-btn {
   position: absolute;
   top: 4px;
   right: 4px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
   border: none;
   border-radius: 50%;
   font-size: 12px;
@@ -430,20 +366,26 @@ h2 {
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  line-height: 1;
 }
 
 .preview-remove-btn:hover {
-  background: white;
+  background: rgba(0, 0, 0, 0.8);
 }
 
+
+/* Insurance Button Styling */
 .insurance-button-wrapper {
   display: flex;
   justify-content: center;
   padding: 0.5rem 1rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
 }
 
 .insurance-start-btn {
-  background-color: #00796b;
+  /* KCU Purple */
+  background-color: #4b2e4c;
   color: white;
   border: none;
   border-radius: 20px;
@@ -454,5 +396,52 @@ h2 {
 }
 
 .insurance-start-btn:hover {
-  background-color: #004d40;
+  background-color: #3a223b; /* Darker Purple */
+}
+
+/* Estimate UI Styling */
+.estimate-ui {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
+}
+
+.estimate-ui select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.estimate-btn {
+  /* KCU Purple */
+  background-color: #4b2e4c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.estimate-btn:hover {
+  background-color: #3a223b; /* Darker Purple */
+}
+
+/* Error Toast Styling */
+.toast-error {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #d9534f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 1200;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
