@@ -1,9 +1,33 @@
 import { useState, useRef, useEffect } from "react";
 import expandIcon from "./assets/expand.png";
 import botProfile from "./assets/botProfile.png";
-import { procedureCosts } from "./procedureCosts";
+import { procedureCosts } from "./procedureCosts.js";
 
 // --- Helper Components ---
+
+const MedicareMedicaidSelector = ({ onSelect }) => (
+  <div className="flex justify-center gap-3 p-3">
+    <button onClick={() => onSelect('Medicare')} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-bold">Medicare</button>
+    <button onClick={() => onSelect('Medicaid')} className="flex-1 bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-bold">Medicaid</button>
+  </div>
+);
+
+const QuickMedicareEstimate = ({ onEstimate }) => {
+  const [procedure, setProcedure] = useState("");
+  return (
+    <div className="p-4 space-y-3 bg-gray-100 rounded-lg">
+      <select value={procedure} onChange={e => setProcedure(e.target.value)} className="w-full p-3 border border-gray-300 rounded-md">
+        <option value="">-- Select a Procedure --</option>
+        {Object.keys(procedureCosts).map(p => <option key={p} value={p}>{p}</option>)}
+      </select>
+      <div className="flex justify-center gap-3">
+        <button onClick={() => procedure && onEstimate(procedure, 'Medicare')} disabled={!procedure} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-bold disabled:bg-gray-400">Estimate with Medicare</button>
+        <button onClick={() => procedure && onEstimate(procedure, 'Medicaid')} disabled={!procedure} className="flex-1 bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-bold disabled:bg-gray-400">Estimate with Medicaid</button>
+      </div>
+    </div>
+  );
+};
+
 const InsuranceProviderSelector = ({ onSelectProvider }) => {
   const [selection, setSelection] = useState("");
   const [otherValue, setOtherValue] = useState("");
@@ -33,7 +57,6 @@ const InsuranceProviderSelector = ({ onSelectProvider }) => {
 };
 
 const ProcedureSelector = ({ selected, onToggle, onCalculate }) => {
-  // Group related procedures to display them on the same row
   const procedureGroups = [
     ['Routine Cleaning', 'Deep Cleaning'],
     ['Dental Exam', 'X-Ray (Bitewing)'],
@@ -121,6 +144,7 @@ export default function Chatbot() {
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", isOther: false });
   const [selectedProcedures, setSelectedProcedures] = useState([]);
   const [uploadContext, setUploadContext] = useState('general');
+  const [insuranceType, setInsuranceType] = useState(null);
   
   const [appointmentData, setAppointmentData] = useState({
     fullName: "", email: "", bookingDay: "", timeSlot: "",
@@ -168,6 +192,7 @@ export default function Chatbot() {
             fullName: "", email: "", bookingDay: "", timeSlot: "",
             reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
         });
+        setInsuranceType(null);
     }
   };
 
@@ -224,40 +249,64 @@ export default function Chatbot() {
 
   const handleFullEstimate = () => {
     if (selectedProcedures.length === 0) {
-      addMessage("bot", "Please select at least one procedure.");
-      return;
+        addMessage("bot", "Please select at least one procedure.");
+        return;
     }
-    const { provider, isOther } = insuranceData;
-    if (isOther) {
-      let noInsuranceCost = 0, ballparkCost = 0;
-      const comparisonPlan = "BrightSmile Basic";
-      selectedProcedures.forEach(proc => {
-        noInsuranceCost += parseFloat(procedureCosts[proc]["No Insurance"].replace(/[^0-9.-]+/g, ""));
-        ballparkCost += parseFloat(procedureCosts[proc][comparisonPlan].replace(/[^0-9.-]+/g, ""));
-      });
-      const otherInsuranceMessage = `I am not sure if **${provider}** is supported by us as it is not on our general list. However, I highly recommend you book an appointment to see if it is. \n\nYour price without any insurance coverage would be **$${noInsuranceCost.toFixed(2)}**.\n\nFor comparison, if your plan is similar to our other partners, your cost could be around **$${ballparkCost.toFixed(2)}**. If **${provider}** is covered, it will be a much better price.`;
-      addMessage("bot", otherInsuranceMessage);
+    const { provider } = insuranceData;
+
+    if (insuranceType === 'private') {
+        let upfrontCost = 0;
+        let afterCoverageCost = 0;
+
+        selectedProcedures.forEach(proc => {
+            const noInsuranceStr = procedureCosts[proc]["No Insurance"];
+            const withInsuranceStr = procedureCosts[proc]?.[provider] || noInsuranceStr;
+            
+            upfrontCost += parseFloat(noInsuranceStr.replace(/[^0-9.-]+/g, ""));
+            afterCoverageCost += parseFloat(withInsuranceStr.replace(/[^0-9.-]+/g, ""));
+        });
+        
+        const finalMessage = `For non-Medicaid/Medicare plans, the full upfront cost is due at the time of service. After your insurance provider processes the claim, you will receive a check in the mail for the covered amount.\n\n` +
+            `**Total Upfront Cost: $${upfrontCost.toFixed(2)}**\n` +
+            `\nBased on your **${provider}** plan, your estimated cost after reimbursement would be:\n` +
+            `**Total Estimated Cost (After Coverage): $${afterCoverageCost.toFixed(2)}**`;
+        
+        addMessage("bot", finalMessage);
+
     } else {
-      let totalCost = 0;
-      const costDetails = selectedProcedures.map(proc => {
-        const costStr = procedureCosts[proc]?.[provider] || procedureCosts[proc]?.["No Insurance"];
-        const costNum = parseFloat(costStr.replace(/[^0-9.-]+/g, ""));
-        totalCost += costNum;
-        return `\n- ${proc}: **${costStr}**`;
-      }).join('');
-      const finalMessage = `Based on your **${provider}** plan, here is your itemized estimate:\n${costDetails}\n\n**Total Estimated Cost: $${totalCost.toFixed(2)}**`;
-      addMessage("bot", finalMessage);
+        let totalCost = 0;
+        const costDetails = selectedProcedures.map(proc => {
+            const costStr = procedureCosts[proc]?.[provider] || procedureCosts[proc]?.["No Insurance"];
+            const costNum = parseFloat(costStr.replace(/[^0-9.-]+/g, ""));
+            totalCost += costNum;
+            return `\n- ${proc}: **${costStr}**`;
+        }).join('');
+        const finalMessage = `Based on your **${provider}** plan, here is your itemized estimate:\n${costDetails}\n\n**Total Estimated Cost: $${totalCost.toFixed(2)}**`;
+        addMessage("bot", finalMessage);
     }
+    
     setChatFlowStage("start");
     setSelectedProcedures([]);
     setInsuranceData({ provider: "", memberId: "", isOther: false });
+    setInsuranceType(null);
   };
-
+  
   const handleQuickEstimate = (procedure, insurance) => {
-    const cost = procedureCosts[procedure][insurance];
     addMessage("user", `Estimate for ${procedure} with ${insurance}`);
-    addMessage("bot", `The estimated cost for ${procedure} with ${insurance} is **${cost}**.`);
+    const cost = procedureCosts[procedure][insurance];
+
+    if (insuranceType === 'private') {
+        const upfrontCost = procedureCosts[procedure]["No Insurance"];
+        const privateMessage = `The full upfront cost for a ${procedure} is **${upfrontCost}**. ` +
+            `After your insurance coverage is applied and processed, your final estimated cost will be **${cost}**. ` +
+            `You will receive the difference as a reimbursement check in the mail.`;
+        addMessage("bot", privateMessage);
+    } else {
+        addMessage("bot", `The estimated cost for a ${procedure} with ${insurance} is **${cost}**.`);
+    }
+    
     setChatFlowStage("start");
+    setInsuranceType(null);
   };
 
   const handleSend = async (overrideText) => {
@@ -268,10 +317,20 @@ export default function Chatbot() {
     const lowered = userMessage.toLowerCase();
     const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
     
-    // --- MODIFIED: Booking & Pre-registration Flow ---
     if (chatFlowStage === "start" && (lowered.includes("appointment") || lowered.includes("book"))) {
         addMessage("bot", "To save time during your visit, would you like to fill out some pre-registration forms now? (yes/no)");
         setChatFlowStage("awaiting_prereg_decision");
+        return;
+    }
+    
+    if (chatFlowStage === "awaiting_medicare_decision") {
+        if (affirmativeResponses.includes(lowered)) {
+            setInsuranceType('medicare_medicaid');
+        } else {
+            setInsuranceType('private');
+        }
+        addMessage("bot", "Got it! Would you like to get a 'full' insurance estimate for multiple procedures, or a 'quick' one for a single item? (Type 'full' or 'estimate')");
+        setChatFlowStage("choose_insurance_path");
         return;
     }
 
@@ -369,6 +428,7 @@ export default function Chatbot() {
                 addMessage("bot", "I'm sorry about that. Let's start over to make sure we get it right. What is your full name?");
                 setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: "" });
                 setChatFlowStage('booking_start');
+                setInsuranceType(null); // Reset
             }
             break;
         default:
@@ -380,11 +440,21 @@ export default function Chatbot() {
 
     if (chatFlowStage === "choose_insurance_path") {
       if (lowered === 'full') {
-        addMessage("bot", "Great. Would you like to upload a photo of your insurance card or enter the details manually?");
-        setChatFlowStage("awaiting_upload_or_manual");
+          if (insuranceType === 'medicare_medicaid') {
+              addMessage("bot", "Understood. Please select whether you have Medicare or Medicaid below.");
+              setChatFlowStage('selecting_medicaid_type_full');
+          } else {
+              addMessage("bot", "Great. Would you like to upload a photo of your insurance card or enter the details manually?");
+              setChatFlowStage("awaiting_upload_or_manual");
+          }
       } else if (lowered === 'estimate') {
-        addMessage("bot", "No problem! Please select a procedure and your insurance from the dropdowns below to get a quick cost estimate.");
-        setChatFlowStage("estimate_only");
+          if (insuranceType === 'medicare_medicaid') {
+              addMessage("bot", "No problem! Please select a procedure below to get a quick estimate.");
+              setChatFlowStage('medicaid_quick_estimate');
+          } else {
+              addMessage("bot", "No problem! Please select a procedure and your insurance from the dropdowns below to get a quick cost estimate.");
+              setChatFlowStage("estimate_only");
+          }
       }
       return;
     }
@@ -448,7 +518,7 @@ export default function Chatbot() {
     }
     
     const showOnlyTextInput = chatFlowStage.startsWith('booking_') || 
-                              ['awaiting_prereg_decision', 'awaiting_booking_method'].includes(chatFlowStage);
+                              ['awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path'].includes(chatFlowStage);
     
     if (showOnlyTextInput) {
         return (
@@ -460,6 +530,15 @@ export default function Chatbot() {
     }
 
     switch(chatFlowStage) {
+      case 'selecting_medicaid_type_full':
+        return <MedicareMedicaidSelector onSelect={(type) => {
+          addMessage("user", type);
+          setInsuranceData({ provider: type, memberId: "", isOther: false });
+          addMessage("bot", `Great, you've selected ${type}. Now please choose the procedures you're interested in.`);
+          setChatFlowStage("selecting_multiple_procedures");
+        }} />;
+      case 'medicaid_quick_estimate':
+        return <QuickMedicareEstimate onEstimate={handleQuickEstimate} />;
       case 'awaiting_upload_or_manual':
         return (
           <div className="flex justify-center gap-2 p-2">
@@ -517,8 +596,8 @@ export default function Chatbot() {
             { chatFlowStage === 'start' && (
               <div className="insurance-button-wrapper">
                 <button className="insurance-start-btn" onClick={() => {
-                  addMessage("bot", "Got it! Would you like to:\n1. Enter full insurance info\n2. Get a quick estimate\nType 'full' or 'estimate'.");
-                  setChatFlowStage("choose_insurance_path");
+                  addMessage("bot", "Before we proceed, could you please confirm if you are covered by Medicare or Medicaid? (yes/no)");
+                  setChatFlowStage("awaiting_medicare_decision");
                 }}>🩺 Get Insurance Estimate</button>
               </div>
             )}
