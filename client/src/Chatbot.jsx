@@ -38,9 +38,9 @@ const TimeSlotSelector = ({ onTimeSelect, bookedSlots }) => {
                 {timeSlots.map(time => {
                     const isBooked = bookedSlots.includes(time);
                     return (
-                        <button 
-                            key={time} 
-                            onClick={() => !isBooked && onTimeSelect(time)} 
+                        <button
+                            key={time}
+                            onClick={() => !isBooked && onTimeSelect(time)}
                             className={`time-slot-btn ${isBooked ? 'booked' : ''}`}
                             disabled={isBooked}
                         >
@@ -216,7 +216,7 @@ export default function Chatbot() {
 
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-    
+
     const logConversation = async (userMsg, botMsg) => {
         try {
             await fetch("http://localhost:5050/log", {
@@ -390,8 +390,14 @@ export default function Chatbot() {
         setIsBotTyping(true);
         const lowered = userMessage.toLowerCase();
         const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
+        
+        // --- CORRECTED LINKS ---
+        const newPatientBookingLink = "https://mycw198.ecwcloud.com/portal24942/jsp/jspnew/preRegistration_new.jsp";
+        const returningPatientBookingLink = "https://mycw198.ecwcloud.com/portal24942/jsp/100mp/login_otp.jsp";
+        const preregFormLink = "https://kansascity.wufoo.com/forms/kcucdm-prospective-patient-inquiry-form/";
 
-        const bookingMessage = `To book your appointment, you can use our secure online portal here: <a href="https://forms.gle/k1kHBp6HDrHpre1aA" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Book Online</a>. \n\nIf you'd prefer, I can assist you with booking right here. Just say "assist me".`;
+        const newPatientBookingMessage = `To book your appointment, you can use our secure online portal here: <a href="${newPatientBookingLink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Book Online</a>. \n\nIf you'd prefer, I can assist you with booking right here. Just say "assist me".`;
+        const returningPatientBookingMessage = `To book your appointment, you can use our secure online portal for returning patients here: <a href="${returningPatientBookingLink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Book Online</a>. \n\nIf you'd prefer, I can assist you with booking right here. Just say "assist me".`;
 
         if (chatFlowStage === "start" && (lowered.includes("appointment") || lowered.includes("book"))) {
             addMessage("bot", "Have you visited us before and already completed our pre-registration forms? (yes/no)");
@@ -402,7 +408,8 @@ export default function Chatbot() {
 
         if (chatFlowStage === "awaiting_returning_patient_status") {
             if (affirmativeResponses.includes(lowered)) {
-                addMessage("bot", `Welcome back! Your forms should be on file. ${bookingMessage}`);
+                // Use the correct message for returning patients
+                addMessage("bot", `Welcome back! Your forms should be on file. ${returningPatientBookingMessage}`);
                 setChatFlowStage("awaiting_booking_method");
             } else {
                 addMessage("bot", "To save time during your visit, would you like to fill out our pre-registration forms now? (yes/no)");
@@ -411,7 +418,7 @@ export default function Chatbot() {
             setIsBotTyping(false);
             return;
         }
-        
+
         if (chatFlowStage === "awaiting_medicare_decision") {
             if (affirmativeResponses.includes(lowered)) {
                 setInsuranceType('medicare_medicaid');
@@ -426,10 +433,10 @@ export default function Chatbot() {
 
         if (chatFlowStage === "awaiting_prereg_decision") {
             if (affirmativeResponses.includes(lowered)) {
-                addMessage("bot", `Great! You can complete your pre-registration forms here to save time: <a href="/fake-prereg-form" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Pre-Registration Form</a>.`);
-                addMessage("bot", `Once that's done, let's get you booked. ${bookingMessage}`);
+                addMessage("bot", `Great! You can complete your pre-registration forms here to save time: <a href="${preregFormLink}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Pre-Registration Form</a>.`);
+                addMessage("bot", `Once that's done, let's get you booked. ${newPatientBookingMessage}`);
             } else {
-                addMessage("bot", `No problem. ${bookingMessage}`);
+                addMessage("bot", `No problem. ${newPatientBookingMessage}`);
             }
             setChatFlowStage("awaiting_booking_method");
             setIsBotTyping(false);
@@ -523,7 +530,7 @@ export default function Chatbot() {
             setIsBotTyping(false);
             return;
         }
-        
+
         if (chatFlowStage === "choose_insurance_path") {
             if (lowered === 'full') {
                 if (insuranceType === 'medicare_medicaid') {
@@ -632,14 +639,14 @@ export default function Chatbot() {
         }
 
         if (chatFlowStage === 'booking_ask_time') {
-            return <TimeSlotSelector 
+            return <TimeSlotSelector
                 bookedSlots={bookedSlots}
                 onTimeSelect={(time) => {
                     addMessage("user", time);
                     setAppointmentData(prev => ({ ...prev, timeSlot: time }));
                     addMessage("bot", "Is this visit for an Urgent matter or a General check-up?");
                     setChatFlowStage('booking_ask_reason_category');
-                }} 
+                }}
             />;
         }
 
@@ -651,11 +658,11 @@ export default function Chatbot() {
                 setChatFlowStage('booking_ask_reason');
             }} />;
         }
-        
+
         if (chatFlowStage === 'booking_ask_insurance_type') {
             return <ConfirmationButtons onConfirm={() => handleSend("yes")} onDeny={() => handleSend("no")} />;
         }
-        
+
         if (chatFlowStage === 'booking_select_medicaid_type') {
             return <MedicareMedicaidSelector onSelect={(type) => {
                 addMessage("user", type);
@@ -664,7 +671,7 @@ export default function Chatbot() {
                 setChatFlowStage('booking_ask_notes');
             }} />
         }
-        
+
         if (chatFlowStage === 'booking_select_private_provider') {
             return <InsuranceProviderSelector onSelectProvider={(provider) => {
                 addMessage("user", provider);
