@@ -211,7 +211,7 @@ export default function Chatbot() {
 
     const [appointmentData, setAppointmentData] = useState({
         fullName: "", email: "", bookingDay: "", timeSlot: "",
-        reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+        reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", memberId: "", notes: ""
     });
 
     const messagesEndRef = useRef(null);
@@ -259,7 +259,7 @@ export default function Chatbot() {
             setChatFlowStage("start");
             setAppointmentData({
                 fullName: "", email: "", bookingDay: "", timeSlot: "",
-                reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+                reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", memberId: "", notes: ""
             });
             setInsuranceType(null);
         }
@@ -289,8 +289,8 @@ export default function Chatbot() {
                 const extractedData = await extractRes.json();
                 if (!extractRes.ok) throw new Error(extractedData.error || "Extraction failed");
 
-                const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold"];
-                let foundProvider = knownProviders.find(p => extractedData.provider.includes(p)) || extractedData.provider;
+                const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold", "Medicare", "Medicaid"];
+                let foundProvider = knownProviders.find(p => extractedData.provider.toLowerCase().includes(p.toLowerCase())) || extractedData.provider;
 
                 setInsuranceData({ ...extractedData, provider: foundProvider, isOther: false });
 
@@ -391,7 +391,6 @@ export default function Chatbot() {
         const lowered = userMessage.toLowerCase();
         const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
         
-        // --- CORRECTED LINKS ---
         const newPatientBookingLink = "https://mycw198.ecwcloud.com/portal24942/jsp/jspnew/preRegistration_new.jsp";
         const returningPatientBookingLink = "https://mycw198.ecwcloud.com/portal24942/jsp/100mp/login_otp.jsp";
         const preregFormLink = "https://kansascity.wufoo.com/forms/kcucdm-prospective-patient-inquiry-form/";
@@ -408,7 +407,6 @@ export default function Chatbot() {
 
         if (chatFlowStage === "awaiting_returning_patient_status") {
             if (affirmativeResponses.includes(lowered)) {
-                // Use the correct message for returning patients
                 addMessage("bot", `Welcome back! Your forms should be on file. ${returningPatientBookingMessage}`);
                 setChatFlowStage("awaiting_booking_method");
             } else {
@@ -483,7 +481,7 @@ export default function Chatbot() {
                         addMessage("bot", "Are you covered by Medicare or Medicaid?");
                         setChatFlowStage('booking_ask_insurance_type');
                     } else {
-                        setAppointmentData(prev => ({ ...prev, hasInsurance: false, insuranceProvider: "N/A" }));
+                        setAppointmentData(prev => ({ ...prev, hasInsurance: false, insuranceProvider: "N/A", memberId: "N/A" }));
                         addMessage("bot", "Understood. Lastly, is there anything else you'd like us to know for your appointment booking? (e.g., specific concerns, accessibility needs). Type 'skip' if not.");
                         setChatFlowStage('booking_ask_notes');
                     }
@@ -496,6 +494,11 @@ export default function Chatbot() {
                         setChatFlowStage('booking_select_private_provider');
                     }
                     break;
+                case 'booking_ask_member_id':
+                    setAppointmentData(prev => ({...prev, memberId: userMessage}));
+                    addMessage("bot", "Got it. Lastly, is there anything else you'd like us to know for your appointment booking? (e.g., specific concerns, accessibility needs). Type 'skip' if not.");
+                    setChatFlowStage('booking_ask_notes');
+                    break;
                 case 'booking_ask_notes':
                     const finalData = { ...appointmentData, notes: userMessage.toLowerCase() === 'skip' ? 'N/A' : userMessage };
                     setAppointmentData(finalData);
@@ -507,7 +510,7 @@ export default function Chatbot() {
                         `- **Time:** ${finalData.timeSlot}\n` +
                         `- **Visit Type:** ${finalData.reasonCategory}\n` +
                         `- **Reason:** ${finalData.reason}\n` +
-                        `- **Insurance:** ${finalData.hasInsurance ? `Yes (${finalData.insuranceProvider})` : 'No'}\n` +
+                        `- **Insurance:** ${finalData.hasInsurance ? `Yes (${finalData.insuranceProvider}, ID: ${finalData.memberId})` : 'No'}\n` +
                         `- **Notes:** ${finalData.notes}\n\n` +
                         `Is this all correct? (yes/no)`;
                     addMessage("bot", summary);
@@ -518,7 +521,7 @@ export default function Chatbot() {
                         submitAppointment(appointmentData);
                     } else {
                         addMessage("bot", "I'm sorry about that. Let's start over to make sure we get it right. What is your full name?");
-                        setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: "" });
+                        setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", memberId: "", notes: "" });
                         setChatFlowStage('booking_start');
                         setInsuranceType(null); // Reset
                     }
@@ -533,13 +536,8 @@ export default function Chatbot() {
 
         if (chatFlowStage === "choose_insurance_path") {
             if (lowered === 'full') {
-                if (insuranceType === 'medicare_medicaid') {
-                    addMessage("bot", "Understood. Please select whether you have Medicare or Medicaid below.");
-                    setChatFlowStage('selecting_medicaid_type_full');
-                } else {
-                    addMessage("bot", "Great. Would you like to upload a photo of your insurance card or enter the details manually?");
-                    setChatFlowStage("awaiting_upload_or_manual");
-                }
+                addMessage("bot", "Great. Would you like to upload a photo of your insurance card or enter the details manually?");
+                setChatFlowStage("awaiting_upload_or_manual");
             } else if (lowered === 'estimate') {
                 if (insuranceType === 'medicare_medicaid') {
                     addMessage("bot", "No problem! Please select a procedure below to get a quick estimate.");
@@ -552,30 +550,24 @@ export default function Chatbot() {
             setIsBotTyping(false);
             return;
         }
+        
         if (chatFlowStage === "awaiting_upload_or_manual") {
             if (lowered.includes('upload')) {
                 setUploadContext('insurance');
                 fileInputRef.current.click();
             } else if (lowered.includes('manual')) {
-                addMessage("bot", "Please select your insurance provider from the list below.");
-                setChatFlowStage("awaiting_manual_provider");
+                if(insuranceType === 'medicare_medicaid') {
+                    setChatFlowStage("awaiting_manual_medicare_type");
+                } else {
+                    addMessage("bot", "Please select your insurance provider from the list below.");
+                    setChatFlowStage("awaiting_manual_provider");
+                }
             }
             setIsBotTyping(false);
             return;
         }
-        if (chatFlowStage === "confirming_photo_details") {
-            if (affirmativeResponses.includes(lowered)) {
-                addMessage("bot", "Excellent! Now, please select the procedure(s) you're interested in.");
-                setChatFlowStage("selecting_multiple_procedures");
-            } else {
-                addMessage("bot", "No problem. Let's enter the details manually. Please select your provider from the list.");
-                setInsuranceData({ provider: "", memberId: "", isOther: false });
-                setChatFlowStage("awaiting_manual_provider");
-            }
-            setIsBotTyping(false);
-            return;
-        }
-        if (chatFlowStage === "awaiting_manual_member_id") {
+
+        if (chatFlowStage === "awaiting_manual_member_id_estimate") {
             setInsuranceData(prev => ({ ...prev, memberId: userMessage }));
             addMessage("bot", "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in.");
             setChatFlowStage("selecting_multiple_procedures");
@@ -583,7 +575,23 @@ export default function Chatbot() {
             return;
         }
 
-
+        if (chatFlowStage === "confirming_photo_details") {
+            if (affirmativeResponses.includes(lowered)) {
+                addMessage("bot", "Excellent! Now, please select the procedure(s) you're interested in.");
+                setChatFlowStage("selecting_multiple_procedures");
+            } else {
+                addMessage("bot", "No problem. Let's enter the details manually.");
+                setInsuranceData({ provider: "", memberId: "", isOther: false });
+                if(insuranceType === 'medicare_medicaid') {
+                    setChatFlowStage("awaiting_manual_medicare_type");
+                } else {
+                    setChatFlowStage("awaiting_manual_provider");
+                }
+            }
+            setIsBotTyping(false);
+            return;
+        }
+        
         try {
             const res = await fetch("http://localhost:5050/chat", {
                 method: "POST",
@@ -667,8 +675,8 @@ export default function Chatbot() {
             return <MedicareMedicaidSelector onSelect={(type) => {
                 addMessage("user", type);
                 setAppointmentData(prev => ({...prev, insuranceProvider: type}));
-                addMessage("bot", "Got it. Lastly, is there anything else you'd like us to know for your appointment booking? (e.g., specific concerns, accessibility needs). Type 'skip' if not.");
-                setChatFlowStage('booking_ask_notes');
+                addMessage("bot", `Got it: ${type}. Now, what is your Member ID?`);
+                setChatFlowStage('booking_ask_member_id');
             }} />
         }
 
@@ -676,14 +684,14 @@ export default function Chatbot() {
             return <InsuranceProviderSelector onSelectProvider={(provider) => {
                 addMessage("user", provider);
                 setAppointmentData(prev => ({...prev, insuranceProvider: provider}));
-                addMessage("bot", "Got it. Lastly, is there anything else you'd like us to know for your appointment booking? (e.g., specific concerns, accessibility needs). Type 'skip' if not.");
-                setChatFlowStage('booking_ask_notes');
+                addMessage("bot", `Got it: ${provider}. Now, what is your Member ID?`);
+                setChatFlowStage("booking_ask_member_id");
             }} />;
         }
 
-
         const showOnlyTextInput = chatFlowStage.startsWith('booking_') ||
-            ['awaiting_returning_patient_status', 'awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path', 'awaiting_manual_member_id'].includes(chatFlowStage);
+            ['awaiting_returning_patient_status', 'awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path', 'awaiting_manual_member_id_estimate'].includes(chatFlowStage);
+
 
         if (showOnlyTextInput) {
             return (
@@ -695,19 +703,19 @@ export default function Chatbot() {
         }
 
         switch (chatFlowStage) {
-            case 'selecting_medicaid_type_full':
-                return <MedicareMedicaidSelector onSelect={(type) => {
+            case 'awaiting_manual_medicare_type':
+                 return <MedicareMedicaidSelector onSelect={(type) => {
                     addMessage("user", type);
                     setInsuranceData({ provider: type, memberId: "", isOther: false });
-                    addMessage("bot", `Great, you've selected ${type}. Now please choose the procedures you're interested in.`);
-                    setChatFlowStage("selecting_multiple_procedures");
+                    addMessage("bot", `Great, you've selected ${type}. Now, what is your Member ID?`);
+                    setChatFlowStage("awaiting_manual_member_id_estimate");
                 }} />;
             case 'medicaid_quick_estimate':
                 return <QuickMedicareEstimate onEstimate={handleQuickEstimate} />;
             case 'awaiting_upload_or_manual':
                 return (
                     <div className="flex justify-center gap-2 p-2">
-                        <button onClick={() => handleSend('Upload Photo')} className="flex-1 bg-blue-500 text-white p-2 rounded-lg font-bold">📷 Upload Photo</button>
+                        <button onClick={() => { setUploadContext('insurance'); fileInputRef.current.click(); }} className="flex-1 bg-blue-500 text-white p-2 rounded-lg font-bold">📷 Upload Photo</button>
                         <button onClick={() => handleSend('Enter Manually')} className="flex-1 bg-gray-500 text-white p-2 rounded-lg font-bold">⌨️ Enter Manually</button>
                     </div>
                 );
@@ -715,8 +723,8 @@ export default function Chatbot() {
                 return <InsuranceProviderSelector onSelectProvider={(provider, isOther) => {
                     addMessage("user", provider);
                     setInsuranceData({ provider, memberId: "", isOther });
-                    addMessage("bot", `Got it: ${provider}. Now, what is your Member ID? (You can also skip this)`);
-                    setChatFlowStage("awaiting_manual_member_id");
+                    addMessage("bot", `Got it: ${provider}. Now, what is your Member ID?`);
+                    setChatFlowStage("awaiting_manual_member_id_estimate");
                 }} />;
             case 'estimate_only':
                 return <QuickEstimateSelector onEstimate={handleQuickEstimate} />;
