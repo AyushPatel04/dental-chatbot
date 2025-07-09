@@ -33,11 +33,27 @@ const upload = multer({
   }
 });
 
+const APPOINTMENT_LOG_FILE = path.join(__dirname, "appointments.json");
+
+const readAppointments = () => {
+    try {
+        if (fs.existsSync(APPOINTMENT_LOG_FILE)) {
+            const data = fs.readFileSync(APPOINTMENT_LOG_FILE, "utf8");
+            return JSON.parse(data || "[]");
+        }
+    } catch (err) {
+        console.error("Error reading or parsing appointments file:", err);
+    }
+    return [];
+};
+
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded or invalid type" });
   const fullUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
   res.json({ url: fullUrl });
 });
+
+// Other endpoints... (extract-info, chat, log) remain the same
 
 app.post("/extract-info", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file provided for extraction." });
@@ -139,22 +155,42 @@ app.post("/log", (req, res) => {
 
 app.post("/book-appointment", (req, res) => {
   const appointmentData = { ...req.body, submissionTimestamp: new Date().toISOString() };
-  console.log("New Appointment Booking Request:", JSON.stringify(appointmentData, null, 2));
+  const appointments = readAppointments();
+  
+  // Check for double booking before saving
+  const isBooked = appointments.some(app => app.bookingDay === appointmentData.bookingDay && app.timeSlot === appointmentData.timeSlot);
+  if (isBooked) {
+      return res.status(409).json({ error: "This time slot is no longer available." });
+  }
 
-  const APPOINTMENT_LOG_FILE = path.join(__dirname, "appointments.json");
-  fs.readFile(APPOINTMENT_LOG_FILE, "utf8", (err, data) => {
-    const appointments = err ? [] : JSON.parse(data || "[]");
-    appointments.push(appointmentData);
-    fs.writeFile(APPOINTMENT_LOG_FILE, JSON.stringify(appointments, null, 2), (writeErr) => {
-      if (writeErr) {
-        console.error("Failed to log appointment:", writeErr);
-        return res.status(500).send("Failed to save appointment");
-      }
-      res.status(200).json({ message: "Appointment booked successfully and logged." });
-    });
+  appointments.push(appointmentData);
+  fs.writeFile(APPOINTMENT_LOG_FILE, JSON.stringify(appointments, null, 2), (writeErr) => {
+    if (writeErr) {
+      console.error("Failed to log appointment:", writeErr);
+      return res.status(500).send("Failed to save appointment");
+    }
+    console.log("New Appointment Booking Request:", JSON.stringify(appointmentData, null, 2));
+    res.status(200).json({ message: "Appointment booked successfully and logged." });
   });
+});
+
+app.get("/get-appointments", (req, res) => {
+    const appointments = readAppointments();
+    res.json(appointments);
+});
+
+// --- NEW ENDPOINT TO CHECK BOOKED SLOTS ---
+app.get("/get-booked-slots", (req, res) => {
+    const { date } = req.query;
+    if (!date) {
+        return res.status(400).json({ error: "Date query parameter is required." });
+    }
+    const appointments = readAppointments();
+    const bookedSlots = appointments
+        .filter(app => app.bookingDay === date)
+        .map(app => app.timeSlot);
+    res.json(bookedSlots);
 });
 
 const PORT = 5050;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
