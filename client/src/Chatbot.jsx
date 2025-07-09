@@ -5,6 +5,17 @@ import { procedureCosts } from "./procedureCosts.js";
 
 // --- Helper Components ---
 
+const TypingIndicator = () => (
+  <div className="message-row align-left">
+    <img src={botProfile} alt="Bot Avatar" className="message-avatar" />
+    <div className="typing-indicator">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+);
+
 const MedicareMedicaidSelector = ({ onSelect }) => (
   <div className="flex justify-center gap-3 p-3">
     <button onClick={() => onSelect('Medicare')} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-bold">Medicare</button>
@@ -141,6 +152,7 @@ export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
   const [chatFlowStage, setChatFlowStage] = useState("start");
+  const [isBotTyping, setIsBotTyping] = useState(false);
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", isOther: false });
   const [selectedProcedures, setSelectedProcedures] = useState([]);
   const [uploadContext, setUploadContext] = useState('general');
@@ -174,6 +186,7 @@ export default function Chatbot() {
   };
   
   const submitAppointment = async (finalData) => {
+    setIsBotTyping(true);
     addMessage("bot", "Thank you! Submitting your appointment request...");
     try {
         const res = await fetch("http://localhost:5050/book-appointment", {
@@ -187,6 +200,7 @@ export default function Chatbot() {
     } catch (err) {
         console.error("Appointment submission failed:", err);
     } finally {
+        setIsBotTyping(false);
         setChatFlowStage("start");
         setAppointmentData({
             fullName: "", email: "", bookingDay: "", timeSlot: "",
@@ -201,6 +215,7 @@ export default function Chatbot() {
     if (!file) return;
 
     addMessage("user", `Uploading ${file.name}...`, true);
+    setIsBotTyping(true);
     const formData = new FormData();
     formData.append("image", file);
     
@@ -242,6 +257,7 @@ export default function Chatbot() {
       console.error("Upload process failed:", err);
       addMessage("bot", `Sorry, there was an error processing the image.`);
     } finally {
+      setIsBotTyping(false);
       if (fileInputRef.current) fileInputRef.current.value = null;
       setUploadContext('general');
     }
@@ -293,6 +309,7 @@ export default function Chatbot() {
   
   const handleQuickEstimate = (procedure, insurance) => {
     addMessage("user", `Estimate for ${procedure} with ${insurance}`);
+    setIsBotTyping(true);
     const cost = procedureCosts[procedure][insurance];
 
     if (insuranceType === 'private') {
@@ -305,6 +322,7 @@ export default function Chatbot() {
         addMessage("bot", `The estimated cost for a ${procedure} with ${insurance} is **${cost}**.`);
     }
     
+    setIsBotTyping(false);
     setChatFlowStage("start");
     setInsuranceType(null);
   };
@@ -314,12 +332,14 @@ export default function Chatbot() {
     if (!userMessage) return;
     addMessage("user", userMessage);
     setInput("");
+    setIsBotTyping(true);
     const lowered = userMessage.toLowerCase();
     const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
     
     if (chatFlowStage === "start" && (lowered.includes("appointment") || lowered.includes("book"))) {
         addMessage("bot", "To save time during your visit, would you like to fill out some pre-registration forms now? (yes/no)");
         setChatFlowStage("awaiting_prereg_decision");
+        setIsBotTyping(false);
         return;
     }
     
@@ -331,6 +351,7 @@ export default function Chatbot() {
         }
         addMessage("bot", "Got it! Would you like to get a 'full' insurance estimate for multiple procedures, or a 'quick' one for a single item? (Type 'full' or 'estimate')");
         setChatFlowStage("choose_insurance_path");
+        setIsBotTyping(false);
         return;
     }
 
@@ -344,6 +365,7 @@ export default function Chatbot() {
             addMessage("bot", `No problem. ${bookingMessage}`);
         }
         setChatFlowStage("awaiting_booking_method");
+        setIsBotTyping(false);
         return;
     }
 
@@ -355,6 +377,7 @@ export default function Chatbot() {
              addMessage("bot", "No problem, you can use the link when you're ready or let me know if you need anything else!");
              setChatFlowStage("start");
         }
+        setIsBotTyping(false);
         return;
     }
 
@@ -435,6 +458,7 @@ export default function Chatbot() {
             setChatFlowStage("start");
             break;
       }
+      setIsBotTyping(false);
       return; 
     }
 
@@ -456,6 +480,7 @@ export default function Chatbot() {
               setChatFlowStage("estimate_only");
           }
       }
+      setIsBotTyping(false);
       return;
     }
     if (chatFlowStage === "awaiting_upload_or_manual") {
@@ -466,6 +491,7 @@ export default function Chatbot() {
         addMessage("bot", "Please select your insurance provider from the list below.");
         setChatFlowStage("awaiting_manual_provider");
       }
+      setIsBotTyping(false);
       return;
     }
     if (chatFlowStage === "confirming_photo_details") {
@@ -477,12 +503,14 @@ export default function Chatbot() {
         setInsuranceData({ provider: "", memberId: "", isOther: false });
         setChatFlowStage("awaiting_manual_provider");
       }
+      setIsBotTyping(false);
       return;
     }
     if (chatFlowStage === "awaiting_manual_member_id") {
       setInsuranceData(prev => ({ ...prev, memberId: userMessage }));
       addMessage("bot", "Thanks! Your insurance info is complete. Now, please select the procedure(s) you're interested in.");
       setChatFlowStage("selecting_multiple_procedures");
+      setIsBotTyping(false);
       return;
     }
     try {
@@ -495,12 +523,14 @@ export default function Chatbot() {
       addMessage("bot", data.reply);
     } catch (err) {
       addMessage("bot", "Sorry, I'm having trouble connecting right now.");
+    } finally {
+        setIsBotTyping(false);
     }
   };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isBotTyping]);
   
   const renderChatStageUI = () => {
     if (chatFlowStage === 'selecting_multiple_procedures') {
@@ -518,7 +548,7 @@ export default function Chatbot() {
     }
     
     const showOnlyTextInput = chatFlowStage.startsWith('booking_') || 
-                              ['awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path'].includes(chatFlowStage);
+                              ['awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path', 'awaiting_manual_member_id'].includes(chatFlowStage);
     
     if (showOnlyTextInput) {
         return (
@@ -581,7 +611,7 @@ export default function Chatbot() {
             </div>
             <div className="messages-container">
               {messages.map((msg, i) => (
-                <div key={i} className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} fade-in`}>
+                <div key={i} className={`message-row ${msg.sender === "user" ? "align-right" : "align-left"} ${msg.sender === 'user' ? 'user-fade-in' : 'fade-in'}`}>
                   {msg.sender === "bot" && !msg.isImage && <img src={botProfile} alt="Bot Avatar" className="message-avatar" />}
                   {msg.isImage ? (
                     <img src={msg.text} alt="Uploaded content" className="chat-image-preview" style={{ maxWidth: '200px', borderRadius: '12px', marginTop: '5px' }} />
@@ -590,6 +620,7 @@ export default function Chatbot() {
                   )}
                 </div>
               ))}
+              {isBotTyping && <TypingIndicator />}
               <div ref={messagesEndRef} />
             </div>
             <input type="file" accept="image/*" id="fileUpload" style={{ display: "none" }} onChange={handleFileSelect} ref={fileInputRef} />
