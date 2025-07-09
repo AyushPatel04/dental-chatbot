@@ -1,3 +1,20 @@
 node_modules/
 
 server/.env
+
+# Node dependencies
+node_modules
+/client/node_modules
+
+# Log files
+/server/logs.json
+/server/appointments.json
+
+# Uploaded files
+/server/uploads/
+
+# Build folder
+/client/build
+
+# Env files
+.env
