@@ -155,12 +155,14 @@ export default function Chatbot() {
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [insuranceData, setInsuranceData] = useState({ provider: "", memberId: "", isOther: false });
   const [selectedProcedures, setSelectedProcedures] = useState([]);
+  const [stagedFile, setStagedFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
   const [uploadContext, setUploadContext] = useState('general');
   const [insuranceType, setInsuranceType] = useState(null);
   
   const [appointmentData, setAppointmentData] = useState({
     fullName: "", email: "", bookingDay: "", timeSlot: "",
-    reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+    reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
   });
 
   const messagesEndRef = useRef(null);
@@ -188,6 +190,7 @@ export default function Chatbot() {
   const submitAppointment = async (finalData) => {
     setIsBotTyping(true);
     addMessage("bot", "Thank you! Submitting your appointment request...");
+    addMessage("bot", "Your appointment request has been received! We will contact you shortly to confirm the details.");
     try {
         const res = await fetch("http://localhost:5050/book-appointment", {
             method: "POST",
@@ -204,7 +207,7 @@ export default function Chatbot() {
         setChatFlowStage("start");
         setAppointmentData({
             fullName: "", email: "", bookingDay: "", timeSlot: "",
-            reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
+            reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: ""
         });
         setInsuranceType(null);
     }
@@ -214,52 +217,38 @@ export default function Chatbot() {
     const file = e.target.files[0];
     if (!file) return;
 
-    addMessage("user", `Uploading ${file.name}...`, true);
     setIsBotTyping(true);
-    const formData = new FormData();
-    formData.append("image", file);
-    
-    try {
-      const uploadRes = await fetch("http://localhost:5050/upload", { method: "POST", body: formData });
-      if (!uploadRes.ok) throw new Error('File upload failed');
-      const { url: imageUrl } = await uploadRes.json();
-      if (!imageUrl) throw new Error("File URL not received.");
-      
-      setMessages(prev => prev.map(m => m.text.startsWith("Uploading") ? { ...m, text: imageUrl, isImage: true } : m));
 
-      if (uploadContext === 'insurance') {
+    if (uploadContext === 'insurance') {
+        addMessage("user", `Uploading insurance card: ${file.name}...`);
         const extractFormData = new FormData();
         extractFormData.append("image", file);
-        const extractRes = await fetch("http://localhost:5050/extract-info", { method: "POST", body: extractFormData });
-        const extractedData = await extractRes.json();
-        if (!extractRes.ok) throw new Error(extractedData.error || "Extraction failed");
-        
-        const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold"];
-        let foundProvider = knownProviders.find(p => extractedData.provider.includes(p)) || extractedData.provider;
-        
-        setInsuranceData({ ...extractedData, provider: foundProvider, isOther: false });
-        
-        const confirmationText = `Please confirm the details from your card:\n- **Provider:** ${foundProvider}\n- **Member Name:** ${extractedData.memberName || "N/A"}\n- **Member ID:** ${extractedData.memberId || "N/A"}\n\nIs this information correct?`;
-        addMessage("bot", confirmationText);
-        setChatFlowStage("confirming_photo_details");
+        try {
+            const extractRes = await fetch("http://localhost:5050/extract-info", { method: "POST", body: extractFormData });
+            const extractedData = await extractRes.json();
+            if (!extractRes.ok) throw new Error(extractedData.error || "Extraction failed");
+            
+            const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold"];
+            let foundProvider = knownProviders.find(p => extractedData.provider?.includes(p)) || extractedData.provider;
+            
+            setInsuranceData({ ...extractedData, provider: foundProvider, isOther: false });
+            
+            const confirmationText = `Please confirm the details from your card:\n- **Provider:** ${foundProvider}\n- **Member Name:** ${extractedData.memberName || "N/A"}\n- **Member ID:** ${extractedData.memberId || "N/A"}\n\nIs this information correct?`;
+            addMessage("bot", confirmationText);
+            setChatFlowStage("confirming_photo_details");
 
-      } else {
-        const chatRes = await fetch("http://localhost:5050/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input, imageUrl }),
-        });
-        const { reply } = await chatRes.json();
-        addMessage("bot", reply);
-        setInput("");
-      }
-    } catch (err) {
-      console.error("Upload process failed:", err);
-      addMessage("bot", `Sorry, there was an error processing the image.`);
-    } finally {
-      setIsBotTyping(false);
-      if (fileInputRef.current) fileInputRef.current.value = null;
-      setUploadContext('general');
+        } catch (err) {
+            console.error("Upload process failed:", err);
+            addMessage("bot", `Sorry, there was an error processing the image.`);
+        } finally {
+            if (fileInputRef.current) fileInputRef.current.value = null;
+            setUploadContext('general');
+            setIsBotTyping(false);
+        }
+    } else {
+        setStagedFile(file);
+        setImagePreviewUrl(URL.createObjectURL(file));
+        setIsBotTyping(false); 
     }
   };
 
@@ -269,8 +258,9 @@ export default function Chatbot() {
         return;
     }
     const { provider } = insuranceData;
-
-    if (insuranceType === 'private') {
+    
+    // Use provider name to determine if it's Medicare/Medicaid, not insuranceType state
+    if (provider !== 'Medicare' && provider !== 'Medicaid') {
         let upfrontCost = 0;
         let afterCoverageCost = 0;
 
@@ -312,7 +302,8 @@ export default function Chatbot() {
     setIsBotTyping(true);
     const cost = procedureCosts[procedure][insurance];
 
-    if (insuranceType === 'private') {
+    // Use insurance name to determine if it's Medicare/Medicaid, not insuranceType state
+    if (insurance !== 'Medicare' && insurance !== 'Medicaid') {
         const upfrontCost = procedureCosts[procedure]["No Insurance"];
         const privateMessage = `The full upfront cost for a ${procedure} is **${upfrontCost}**. ` +
             `After your insurance coverage is applied and processed, your final estimated cost will be **${cost}**. ` +
@@ -329,6 +320,56 @@ export default function Chatbot() {
 
   const handleSend = async (overrideText) => {
     const userMessage = overrideText ?? input.trim();
+    if (!userMessage && !stagedFile) return;
+
+    if (stagedFile) {
+        if (userMessage) {
+            addMessage("user", userMessage);
+        }
+        addMessage("user", imagePreviewUrl, true);
+
+        setInput("");
+        setImagePreviewUrl('');
+        const fileToUpload = stagedFile;
+        setStagedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = null;
+
+        setIsBotTyping(true);
+
+        const formData = new FormData();
+        formData.append("image", fileToUpload);
+
+        try {
+            const uploadRes = await fetch("http://localhost:5050/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!uploadRes.ok) {
+                const errData = await uploadRes.json();
+                throw new Error(errData.error || 'File upload failed');
+            }
+            const { url: imageUrl } = await uploadRes.json();
+            if (!imageUrl) throw new Error("File URL not received.");
+
+            const prompt = userMessage || "Please analyze this image from a dental perspective.";
+            const chatRes = await fetch("http://localhost:5050/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: prompt, imageUrl }),
+            });
+            const { reply, error } = await chatRes.json();
+            if(error) throw new Error(error);
+            addMessage("bot", reply);
+        } catch (err) {
+            console.error("Image chat process failed:", err);
+            addMessage("bot", `Sorry, there was an error: ${err.message}`);
+        } finally {
+            setIsBotTyping(false);
+        }
+        return;
+    }
+
     if (!userMessage) return;
     addMessage("user", userMessage);
     setInput("");
@@ -337,8 +378,20 @@ export default function Chatbot() {
     const affirmativeResponses = ["yes", "yup", "yeah", "correct", "sure", "ok", "yep", "indeed", "right", "confirm"];
     
     if (chatFlowStage === "start" && (lowered.includes("appointment") || lowered.includes("book"))) {
-        addMessage("bot", "To save time during your visit, would you like to fill out some pre-registration forms now? (yes/no)");
-        setChatFlowStage("awaiting_prereg_decision");
+        addMessage("bot", "Have you visited us before and already completed our pre-registration forms? (yes/no)");
+        setChatFlowStage("awaiting_returning_patient_status");
+        setIsBotTyping(false);
+        return;
+    }
+
+    if (chatFlowStage === "awaiting_returning_patient_status") {
+        if (affirmativeResponses.includes(lowered)) {
+            addMessage("bot", "Welcome back! Let's get you booked. First, what is your full name?");
+            setChatFlowStage("booking_start");
+        } else {
+            addMessage("bot", "To save time during your visit, would you like to fill out our pre-registration forms now? (yes/no)");
+            setChatFlowStage("awaiting_prereg_decision");
+        }
         setIsBotTyping(false);
         return;
     }
@@ -404,7 +457,12 @@ export default function Chatbot() {
             break;
         case 'booking_ask_time':
             setAppointmentData(prev => ({ ...prev, timeSlot: userMessage }));
-            addMessage("bot", "What is the primary reason for your visit?");
+            addMessage("bot", "Is this visit for an Urgent matter or a General check-up?");
+            setChatFlowStage('booking_ask_reason_category');
+            break;
+        case 'booking_ask_reason_category':
+            setAppointmentData(prev => ({ ...prev, reasonCategory: userMessage }));
+            addMessage("bot", `Understood. Please briefly describe the reason for your ${userMessage} visit.`);
             setChatFlowStage('booking_ask_reason');
             break;
         case 'booking_ask_reason':
@@ -429,7 +487,7 @@ export default function Chatbot() {
             setChatFlowStage('booking_ask_notes');
             break;
         case 'booking_ask_notes':
-            const finalData = { ...appointmentData, notes: userMessage === 'skip' ? 'N/A' : userMessage };
+            const finalData = { ...appointmentData, notes: userMessage.toLowerCase() === 'skip' ? 'N/A' : userMessage };
             setAppointmentData(finalData);
             
             const summary = `Please confirm your details:\n` +
@@ -437,6 +495,7 @@ export default function Chatbot() {
                 `- **Email:** ${finalData.email}\n` +
                 `- **Date:** ${finalData.bookingDay}\n` +
                 `- **Time:** ${finalData.timeSlot}\n` +
+                `- **Visit Type:** ${finalData.reasonCategory}\n` +
                 `- **Reason:** ${finalData.reason}\n` +
                 `- **Insurance:** ${finalData.hasInsurance ? `Yes (${finalData.insuranceProvider})` : 'No'}\n` +
                 `- **Notes:** ${finalData.notes}\n\n` +
@@ -449,7 +508,7 @@ export default function Chatbot() {
                 submitAppointment(appointmentData);
             } else {
                 addMessage("bot", "I'm sorry about that. Let's start over to make sure we get it right. What is your full name?");
-                setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: "" });
+                setAppointmentData({ fullName: "", email: "", bookingDay: "", timeSlot: "", reasonCategory: "", reason: "", hasInsurance: null, insuranceProvider: "", notes: "" });
                 setChatFlowStage('booking_start');
                 setInsuranceType(null); // Reset
             }
@@ -548,9 +607,9 @@ export default function Chatbot() {
     }
     
     const showOnlyTextInput = chatFlowStage.startsWith('booking_') || 
-                              ['awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path', 'awaiting_manual_member_id'].includes(chatFlowStage);
+                              ['awaiting_prereg_decision', 'awaiting_booking_method', 'awaiting_medicare_decision', 'choose_insurance_path', 'awaiting_manual_member_id', 'awaiting_returning_patient_status'].includes(chatFlowStage);
     
-    if (showOnlyTextInput) {
+    if (showOnlyTextInput && chatFlowStage !== 'booking_ask_reason_category') {
         return (
             <div className="chat-input-row">
                 <input className="chat-input" type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Your answer..." onKeyDown={(e) => e.key === "Enter" && handleSend()} />
@@ -560,6 +619,13 @@ export default function Chatbot() {
     }
 
     switch(chatFlowStage) {
+      case 'booking_ask_reason_category':
+        return (
+            <div className="flex justify-center gap-2 p-2">
+                <button onClick={() => handleSend('Urgent')} className="flex-1 bg-red-500 text-white p-2 rounded-lg font-bold">🚨 Urgent</button>
+                <button onClick={() => handleSend('General')} className="flex-1 bg-blue-500 text-white p-2 rounded-lg font-bold">🗓️ General</button>
+            </div>
+        );
       case 'selecting_medicaid_type_full':
         return <MedicareMedicaidSelector onSelect={(type) => {
           addMessage("user", type);
@@ -572,7 +638,7 @@ export default function Chatbot() {
       case 'awaiting_upload_or_manual':
         return (
           <div className="flex justify-center gap-2 p-2">
-            <button onClick={() => handleSend('Upload Photo')} className="flex-1 bg-blue-500 text-white p-2 rounded-lg font-bold">📷 Upload Photo</button>
+            <button onClick={() => { setUploadContext('insurance'); fileInputRef.current.click(); }} className="flex-1 bg-blue-500 text-white p-2 rounded-lg font-bold">📷 Upload Photo</button>
             <button onClick={() => handleSend('Enter Manually')} className="flex-1 bg-gray-500 text-white p-2 rounded-lg font-bold">⌨️ Enter Manually</button>
           </div>
         );
@@ -624,6 +690,23 @@ export default function Chatbot() {
               <div ref={messagesEndRef} />
             </div>
             <input type="file" accept="image/*" id="fileUpload" style={{ display: "none" }} onChange={handleFileSelect} ref={fileInputRef} />
+            {imagePreviewUrl && (
+                <div className="preview-image-wrapper">
+                    <div className="preview-image-box">
+                        <img src={imagePreviewUrl} alt="Preview" className="preview-img-small" />
+                        <button
+                            className="preview-remove-btn"
+                            onClick={() => {
+                                setImagePreviewUrl('');
+                                setStagedFile(null);
+                                if (fileInputRef.current) fileInputRef.current.value = null;
+                            }}
+                        >
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            )}
             { chatFlowStage === 'start' && (
               <div className="insurance-button-wrapper">
                 <button className="insurance-start-btn" onClick={() => {

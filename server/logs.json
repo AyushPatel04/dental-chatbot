@@ -1386,5 +1386,382 @@
       }
     ],
     "timestamp": "2025-07-08T22:04:43.324Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Understood. Please select whether you have Medicare or Medicaid below."
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:40.748Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "full"
+      },
+      {
+        "sender": "bot",
+        "text": "Great, you've selected Medicare. Now please choose the procedures you're interested in."
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:42.004Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Medicare"
+      },
+      {
+        "sender": "bot",
+        "text": "Based on your **Medicare** plan, here is your itemized estimate:\n\n- Tooth Extraction (Surgical): **$130**\n\n**Total Estimated Cost: $130.00**"
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:43.604Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Medicare"
+      },
+      {
+        "sender": "bot",
+        "text": "Have you visited us before and already completed our pre-registration forms? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:51.699Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "book"
+      },
+      {
+        "sender": "bot",
+        "text": "Welcome back! Let's get you booked. First, what is your full name?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:56.470Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! What is your email address?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:38:58.890Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ayush patel"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. What day would you like to book? (e.g., MM/DD/YYYY or 'next Tuesday')"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:01.895Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "a@gmail.com"
+      },
+      {
+        "sender": "bot",
+        "text": "And what time would be preferred? (e.g., 'morning', 'afternoon', or a specific time)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:05.747Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "tuesday"
+      },
+      {
+        "sender": "bot",
+        "text": "Is this visit for an Urgent matter or a General check-up?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:07.980Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "morning"
+      },
+      {
+        "sender": "bot",
+        "text": "Understood. Please briefly describe the reason for your Urgent visit."
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:09.899Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Urgent"
+      },
+      {
+        "sender": "bot",
+        "text": "Do you have dental insurance? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:12.728Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "hhehdhd"
+      },
+      {
+        "sender": "bot",
+        "text": "Okay. Who is your insurance provider?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:14.079Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Got it. Lastly, is there anything else you'd like us to know? (Type 'skip' if not)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:15.991Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "eee"
+      },
+      {
+        "sender": "bot",
+        "text": "Please confirm your details:\n- **Name:** ayush patel\n- **Email:** a@gmail.com\n- **Date:** tuesday\n- **Time:** morning\n- **Visit Type:** Urgent\n- **Reason:** hhehdhd\n- **Insurance:** Yes (eee)\n- **Notes:** N/A\n\nIs this all correct? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:17.582Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "skip"
+      },
+      {
+        "sender": "bot",
+        "text": "Thank you! Submitting your appointment request..."
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:19.719Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "no"
+      },
+      {
+        "sender": "bot",
+        "text": "No problem! Please select a procedure and your insurance from the dropdowns below to get a quick cost estimate."
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:47.119Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "estimate"
+      },
+      {
+        "sender": "bot",
+        "text": "The estimated cost for a Sealant (Per Tooth) with Medicare is **$25**."
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:50.357Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "Estimate for Sealant (Per Tooth) with Medicare"
+      },
+      {
+        "sender": "bot",
+        "text": "I'm sorry, I can only answer questions related to dentistry."
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:55.086Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "bok"
+      },
+      {
+        "sender": "bot",
+        "text": "Have you visited us before and already completed our pre-registration forms? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:56.332Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "book"
+      },
+      {
+        "sender": "bot",
+        "text": "Welcome back! Let's get you booked. First, what is your full name?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:57.696Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "yes"
+      },
+      {
+        "sender": "bot",
+        "text": "Thanks! What is your email address?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:39:59.508Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "ayush p"
+      },
+      {
+        "sender": "bot",
+        "text": "Great. What day would you like to book? (e.g., MM/DD/YYYY or 'next Tuesday')"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:05.831Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "a@gmail.com"
+      },
+      {
+        "sender": "bot",
+        "text": "And what time would be preferred? (e.g., 'morning', 'afternoon', or a specific time)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:06.696Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "w"
+      },
+      {
+        "sender": "bot",
+        "text": "Is this visit for an Urgent matter or a General check-up?"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:07.287Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "w"
+      },
+      {
+        "sender": "bot",
+        "text": "Understood. Please briefly describe the reason for your General visit."
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:08.881Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "General"
+      },
+      {
+        "sender": "bot",
+        "text": "Do you have dental insurance? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:10.363Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "w"
+      },
+      {
+        "sender": "bot",
+        "text": "Understood. Is there anything else you'd like us to know? (Type 'skip' if not)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:11.151Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "w"
+      },
+      {
+        "sender": "bot",
+        "text": "Please confirm your details:\n- **Name:** ayush p\n- **Email:** a@gmail.com\n- **Date:** w\n- **Time:** w\n- **Visit Type:** General\n- **Reason:** w\n- **Insurance:** No\n- **Notes:** w\n\nIs this all correct? (yes/no)"
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:12.166Z"
+  },
+  {
+    "messages": [
+      {
+        "sender": "user",
+        "text": "w"
+      },
+      {
+        "sender": "bot",
+        "text": "Your appointment request has been received! We will contact you shortly to confirm the details."
+      }
+    ],
+    "timestamp": "2025-07-09T13:40:13.845Z"
   }
 ]
