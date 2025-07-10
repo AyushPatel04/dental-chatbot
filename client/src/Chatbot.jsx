@@ -5,7 +5,19 @@ import expandIcon from "./assets/expand.png";
 import botProfile from "./assets/botProfile.png";
 import { procedureCosts } from "./procedureCosts.js";
 
-// --- Helper Components ---
+// --- Configuration ---
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5050";
+
+// --- Helper Functions & Components ---
+
+// Standardize date to YYYY-MM-DD to avoid localization issues
+const formatDateForAPI = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 const TypingIndicator = () => (
     <div className="message-row align-left">
@@ -219,7 +231,7 @@ export default function Chatbot() {
 
     const logConversation = async (userMsg, botMsg) => {
         try {
-            await fetch("http://localhost:5050/log", {
+            await fetch(`${API_URL}/log`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ messages: [{ sender: "user", text: userMsg }, { sender: "bot", text: botMsg }] }),
@@ -240,7 +252,7 @@ export default function Chatbot() {
         setIsBotTyping(true);
         addMessage("bot", "Thank you! Submitting your appointment request...");
         try {
-            const res = await fetch("http://localhost:5050/book-appointment", {
+            const res = await fetch(`${API_URL}/book-appointment`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(finalData),
@@ -249,7 +261,6 @@ export default function Chatbot() {
                 const errorData = await res.json();
                 throw new Error(errorData.error || "Submission failed on the server.");
             }
-
             addMessage("bot", "Your appointment request has been received! We will contact you shortly to confirm the details.");
         } catch (err) {
             console.error("Appointment submission failed:", err);
@@ -269,53 +280,59 @@ export default function Chatbot() {
         const file = e.target.files[0];
         if (!file) return;
 
-        addMessage("user", `Uploading ${file.name}...`, true);
-        setIsBotTyping(true);
-        const formData = new FormData();
-        formData.append("image", file);
-
-        try {
-            const uploadRes = await fetch("http://localhost:5050/upload", { method: "POST", body: formData });
-            if (!uploadRes.ok) throw new Error('File upload failed');
-            const { url: imageUrl } = await uploadRes.json();
-            if (!imageUrl) throw new Error("File URL not received.");
-
-            setMessages(prev => prev.map(m => m.text.startsWith("Uploading") ? { ...m, text: imageUrl, isImage: true } : m));
-
-            if (uploadContext === 'insurance') {
-                const extractFormData = new FormData();
-                extractFormData.append("image", file);
-                const extractRes = await fetch("http://localhost:5050/extract-info", { method: "POST", body: extractFormData });
-                const extractedData = await extractRes.json();
-                if (!extractRes.ok) throw new Error(extractedData.error || "Extraction failed");
-
-                const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold", "Medicare", "Medicaid"];
-                let foundProvider = knownProviders.find(p => extractedData.provider.toLowerCase().includes(p.toLowerCase())) || extractedData.provider;
-
-                setInsuranceData({ ...extractedData, provider: foundProvider, isOther: false });
-
-                const confirmationText = `Please confirm the details from your card:\n- **Provider:** ${foundProvider}\n- **Member Name:** ${extractedData.memberName || "N/A"}\n- **Member ID:** ${extractedData.memberId || "N/A"}\n\nIs this information correct?`;
-                addMessage("bot", confirmationText);
-                setChatFlowStage("confirming_photo_details");
-
-            } else {
-                const chatRes = await fetch("http://localhost:5050/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: input, imageUrl }),
-                });
-                const { reply } = await chatRes.json();
-                addMessage("bot", reply);
-                setInput("");
-            }
-        } catch (err) {
-            console.error("Upload process failed:", err);
-            addMessage("bot", `Sorry, there was an error processing the image.`);
-        } finally {
-            setIsBotTyping(false);
-            if (fileInputRef.current) fileInputRef.current.value = null;
-            setUploadContext('general');
+        if (file.size > 5 * 1024 * 1024) {
+            addMessage("bot", "Sorry, the image must be 5MB or less.");
+            return;
         }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async (event) => {
+            const imageDataUrl = event.target.result;
+            addMessage("user", imageDataUrl, true); // Show image preview in chat
+            setIsBotTyping(true);
+
+            try {
+                if (uploadContext === 'insurance') {
+                    const extractRes = await fetch(`${API_URL}/extract-info`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ imageDataUrl }),
+                    });
+                    const extractedData = await extractRes.json();
+                    if (!extractRes.ok) throw new Error(extractedData.error || "Extraction failed");
+
+                    const knownProviders = ["BrightSmile Basic", "ToothCare Plus", "HappyMouth Gold", "Medicare", "Medicaid"];
+                    let foundProvider = knownProviders.find(p => extractedData.provider.toLowerCase().includes(p.toLowerCase())) || extractedData.provider;
+                    setInsuranceData({ ...extractedData, provider: foundProvider, isOther: false });
+
+                    const confirmationText = `Please confirm the details from your card:\n- **Provider:** ${foundProvider}\n- **Member Name:** ${extractedData.memberName || "N/A"}\n- **Member ID:** ${extractedData.memberId || "N/A"}\n\nIs this information correct?`;
+                    addMessage("bot", confirmationText);
+                    setChatFlowStage("confirming_photo_details");
+
+                } else { // 'general' context
+                    const chatRes = await fetch(`${API_URL}/chat`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: input, imageDataUrl }),
+                    });
+                    const { reply } = await chatRes.json();
+                    addMessage("bot", reply);
+                    setInput("");
+                }
+            } catch (err) {
+                console.error("Image processing failed:", err);
+                addMessage("bot", `Sorry, there was an error processing the image: ${err.message}`);
+            } finally {
+                setIsBotTyping(false);
+                if (fileInputRef.current) fileInputRef.current.value = null;
+                setUploadContext('general');
+            }
+        };
+        reader.onerror = (error) => {
+            console.error("FileReader error:", error);
+            addMessage("bot", "Sorry, there was an issue reading the selected file.");
+        };
     };
 
     const handleFullEstimate = () => {
@@ -593,7 +610,7 @@ export default function Chatbot() {
         }
         
         try {
-            const res = await fetch("http://localhost:5050/chat", {
+            const res = await fetch(`${API_URL}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userMessage }),
@@ -628,14 +645,17 @@ export default function Chatbot() {
 
         if (chatFlowStage === 'booking_ask_day') {
             return <AppointmentScheduler onDateSelect={async (date) => {
-                const formattedDate = date.toLocaleDateString();
+                const formattedDate = date.toLocaleDateString('en-US'); // Display format
+                const apiFormattedDate = formatDateForAPI(date); // API format YYYY-MM-DD
                 addMessage("user", formattedDate);
                 setIsBotTyping(true);
                 try {
-                    const res = await fetch(`http://localhost:5050/get-booked-slots?date=${encodeURIComponent(formattedDate)}`);
+                    const res = await fetch(`${API_URL}/get-booked-slots?date=${encodeURIComponent(apiFormattedDate)}`);
                     const booked = await res.json();
+                    if (!res.ok) throw new Error("Failed to get available slots.");
+                    
                     setBookedSlots(booked);
-                    setAppointmentData(prev => ({ ...prev, bookingDay: formattedDate }));
+                    setAppointmentData(prev => ({ ...prev, bookingDay: apiFormattedDate }));
                     addMessage("bot", "Perfect. Please select an available time.");
                     setChatFlowStage('booking_ask_time');
                 } catch (error) {

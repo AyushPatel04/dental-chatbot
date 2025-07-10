@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './Dashboard.css'; // We will create this CSS file next
+import './Dashboard.css';
 
 export default function Dashboard() {
     const [appointments, setAppointments] = useState([]);
@@ -8,12 +8,17 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const response = await fetch('http://localhost:5050/get-appointments');
+                // This correctly uses an environment variable for the API URL.
+                // Ensure REACT_APP_API_URL is set in your Vercel deployment environment.
+                const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5050';
+                const response = await fetch(`${apiUrl}/get-appointments`);
+                
                 if (!response.ok) {
                     throw new Error('Failed to fetch appointments');
                 }
                 const data = await response.json();
-                // Sort appointments by date and time
+                
+                // Sort appointments by date and time. This logic is robust and handles YYYY-MM-DD format.
                 const sortedData = data.sort((a, b) => {
                     const dateA = new Date(`${a.bookingDay} ${a.timeSlot.replace(/(AM|PM)/, ' $1')}`);
                     const dateB = new Date(`${b.bookingDay} ${b.timeSlot.replace(/(AM|PM)/, ' $1')}`);

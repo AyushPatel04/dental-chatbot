@@ -2,8 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { OpenAI } = require("openai");
-const multer = require("multer");
-const path = require("path");
+const path =require("path");
 const fs = require("fs");
 
 dotenv.config();
@@ -15,27 +14,29 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
-app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Increased JSON payload limit to handle base64 image data from the client
+app.use(express.json({ limit: '10mb' }));
 
-const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic"];
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, "uploads")),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-});
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (!allowedTypes.includes(file.mimetype)) return cb(new Error("Unsupported file type"), false);
-    const size = parseInt(req.headers["content-length"] || "0");
-    if (size > 5 * 1024 * 1024) return cb(new Error("Image must be 5MB or less"), false);
-    cb(null, true);
-  }
-});
+// --- VERCEL DEPLOYMENT NOTE ---
+// The following functions use `fs` to read and write to local JSON files (`appointments.json`, `logs.json`).
+// Vercel's serverless functions have a temporary and read-only filesystem.
+// This means any data written to these files will NOT persist between requests or server restarts.
+// For a production environment on Vercel, you MUST replace this with a persistent storage solution
+// like Vercel KV, Vercel Postgres, or an external database (e.g., MongoDB, PlanetScale).
 
-const APPOINTMENT_LOG_FILE = path.join(__dirname, "appointments.json");
+const APPOINTMENT_LOG_FILE = path.join("/tmp", "appointments.json");
+const LOG_FILE = path.join("/tmp", "logs.json");
+
+// Helper function to ensure the temporary directory exists
+const ensureTmpDir = () => {
+    const tmpDir = path.join("/tmp");
+    if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+    }
+};
 
 const readAppointments = () => {
+    ensureTmpDir();
     try {
         if (fs.existsSync(APPOINTMENT_LOG_FILE)) {
             const data = fs.readFileSync(APPOINTMENT_LOG_FILE, "utf8");
@@ -47,27 +48,23 @@ const readAppointments = () => {
     return [];
 };
 
-app.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file uploaded or invalid type" });
-  const fullUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-  res.json({ url: fullUrl });
-});
+// REMOVED: The /upload endpoint is not compatible with a stateless server environment like Vercel.
+// Image data will be sent directly to the endpoints that need it as a base64 string.
 
-// Other endpoints... (extract-info, chat, log) remain the same
+app.post("/extract-info", async (req, res) => {
+  // The client now sends a base64 data URL in the request body.
+  const { imageDataUrl } = req.body;
+  if (!imageDataUrl) return res.status(400).json({ error: "No image data provided for extraction." });
 
-app.post("/extract-info", upload.single("image"), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file provided for extraction." });
   try {
-    const imagePath = req.file.path;
-    const base64Image = fs.readFileSync(imagePath).toString("base64");
-    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{
         role: "user",
         content: [
           { type: "text", text: `You are a data extraction tool. Analyze the image of the insurance card and extract the following fields: provider, memberId, memberName. Return the data ONLY in a valid JSON object format. Example: {"provider": "Example Insurance", "memberId": "X12345", "memberName": "John Doe"}. Do not include any text outside of the JSON object.` },
-          { type: "image_url", image_url: { url: dataUrl } },
+          // The base64 data URL is sent directly to OpenAI.
+          { type: "image_url", image_url: { url: imageDataUrl } },
         ],
       }],
       temperature: 0.1,
@@ -81,22 +78,20 @@ app.post("/extract-info", upload.single("image"), async (req, res) => {
 });
 
 app.post("/chat", async (req, res) => {
-  const { message, imageUrl } = req.body;
-  
-  if (imageUrl) {
+  // The client now sends a base64 data URL instead of a file path.
+  const { message, imageDataUrl } = req.body;
+
+  if (imageDataUrl) {
     try {
-      const imagePath = path.resolve(__dirname, "uploads", path.basename(imageUrl));
-      const base64Image = fs.readFileSync(imagePath).toString("base64");
-      const dataUrl = `data:image/jpeg;base64,${base64Image}`;
       const prompt = message || "Please analyze this image from a dental perspective.";
-      
+
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{
           role: "user",
           content: [
             { type: "text", text: `You are a helpful dental assistant AI named Kaysee. A user has provided an image and a question about a potential dental issue. Your task is to offer general, safe advice based on what is visible and explain what a dentist might typically look for. **You must not provide a diagnosis.** Your primary goal is to be helpful while strongly encouraging the user to seek professional care for a proper diagnosis. Frame your response as helpful information, not a medical conclusion. User's question: "${prompt}"` },
-            { type: "image_url", image_url: { url: dataUrl } },
+            { type: "image_url", image_url: { url: imageDataUrl } },
           ],
         }],
       });
@@ -107,6 +102,7 @@ app.post("/chat", async (req, res) => {
     }
   }
 
+  // Text-only chat logic remains the same
   try {
     const topicCheck = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -140,8 +136,8 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-const LOG_FILE = path.join(__dirname, "logs.json");
 app.post("/log", (req, res) => {
+  ensureTmpDir();
   const logData = { ...req.body, timestamp: new Date().toISOString() };
   fs.readFile(LOG_FILE, "utf8", (err, data) => {
     const logs = err ? [] : JSON.parse(data || "[]");
@@ -154,10 +150,10 @@ app.post("/log", (req, res) => {
 });
 
 app.post("/book-appointment", (req, res) => {
+  ensureTmpDir();
   const appointmentData = { ...req.body, submissionTimestamp: new Date().toISOString() };
   const appointments = readAppointments();
   
-  // Check for double booking before saving
   const isBooked = appointments.some(app => app.bookingDay === appointmentData.bookingDay && app.timeSlot === appointmentData.timeSlot);
   if (isBooked) {
       return res.status(409).json({ error: "This time slot is no longer available." });
@@ -179,7 +175,6 @@ app.get("/get-appointments", (req, res) => {
     res.json(appointments);
 });
 
-// --- NEW ENDPOINT TO CHECK BOOKED SLOTS ---
 app.get("/get-booked-slots", (req, res) => {
     const { date } = req.query;
     if (!date) {
@@ -192,5 +187,5 @@ app.get("/get-booked-slots", (req, res) => {
     res.json(bookedSlots);
 });
 
-const PORT = 5050;
+const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
